@@ -5,37 +5,227 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FS_Dynamic"
         mc:Ignorable="d"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="FS Dynamic" Height="550" Width="900" Icon="/FS_Logo.jpg" Topmost="True" Background="#FF4C4343">
-    <Grid Cursor="">
-        <Border Height="400" Width="740" Margin="15" Padding="30" VerticalAlignment="Stretch" CornerRadius="50" Cursor="">
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="Black"/>
-                    <GradientStop Color="#FF009999" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-            <Border.Effect>
-                <DropShadowEffect BlurRadius="30" Color="LightGray" ShadowDepth="0" />
-            </Border.Effect>
+        Title="FS Dynamic - Demo Display" 
+        Height="500" Width="1200" 
+        Icon="/FS_Logo.jpg"
+        WindowState="Normal"
+        WindowStyle="SingleBorderWindow"
+        ResizeMode="CanResize"
+        Background="#FF4C4343"
+        Loaded="Window_Loaded"
+        MouseDown="Window_MouseDown">
 
-            <Grid Margin="0,0,89,32">
-                <TextBlock x:Name="Result_Demo" HorizontalAlignment="Left" Margin="100,109,0,163" TextWrapping="Wrap" Width="196" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" Text="00:000&#xA;" FontWeight="Bold" Height="53"/>
-                <TextBlock x:Name="Team_Name" HorizontalAlignment="Left" Margin="87,78,0,177" TextWrapping="Wrap" Width="196" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" Text="Team" FontWeight="Bold" Height="53"/>
-                <TextBlock x:Name="Round_Number" HorizontalAlignment="Left" Margin="87,51,0,204" TextWrapping="Wrap" Width="196" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" Text="Number" FontWeight="Bold" Height="53"/>
-                <Label Margin="61,109,431,173" Content="Clear Time:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC" Grid.ColumnSpan="2"/>
-                <TextBox x:Name= "Bust_Q" HorizontalAlignment="Left" Margin="160,140,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" Height="36" FontSize="20" Text="0" TextAlignment="Center" Foreground="#FFDCDBDB"/>
-                <TextBox x:Name= "Skip_Q" HorizontalAlignment="Left" Margin="160,181,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" Height="36" FontSize="20" Text="0" TextAlignment="Center" Foreground="#FFDCDBDB"/>
-                <Label Margin="68,150,424,132" Content="Busts:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
-                <Label Margin="68,191,424,91" Content="Skips:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
-                <TextBlock x:Name="Result_plus_Busts" HorizontalAlignment="Left" Margin="100,233,0,0" TextWrapping="Wrap" Text="00:000" VerticalAlignment="Top" Width="196" Height="53" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" FontWeight="Bold"/>
-                <Label Margin="61,233,431,49" Content="Final Time:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
-                <Label Margin="61,78,431,204" Content="Team:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
-                <Label Margin="61,52,431,230" Content="Round:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
-                
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="HugeTimeStyle">
+            <Setter Property="Foreground" Value="#FFDCDBDB"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextWrapping" Value="NoWrap"/>
+            <Setter Property="FontFamily" Value="Segoe UI, Arial"/>
+        </Style>
 
+        <Style TargetType="Label" x:Key="DataLabelStyle">
+            <Setter Property="Foreground" Value="#E5FFFCFC"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontFamily" Value="Segoe UI, Arial"/>
+        </Style>
+
+        <Style TargetType="TextBox" x:Key="CounterTextBoxStyle">
+            <Setter Property="Foreground" Value="#FFDCDBDB"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="#FF009999"/>
+            <Setter Property="BorderThickness" Value="3"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Segoe UI, Arial"/>
+        </Style>
+    </Window.Resources>
+
+    <!-- Заголовок окна с кнопками управления -->
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="35"
+                      ResizeBorderThickness="5"
+                      GlassFrameThickness="0"/>
+    </WindowChrome.WindowChrome>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок окна -->
+        <Border Grid.Row="0" 
+                Background="#FF333333" 
+                Height="35">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Заголовок окна -->
+                <TextBlock Grid.Column="0" 
+                          Text="FS Dynamic - Demo Display" 
+                          Foreground="White" 
+                          FontSize="14"
+                          FontWeight="Bold"
+                          VerticalAlignment="Center"
+                          Margin="10,0"
+                          HorizontalAlignment="Left"/>
+
+                <!-- Кнопки управления окном -->
+                <StackPanel Grid.Column="1" 
+                           Orientation="Horizontal" 
+                           HorizontalAlignment="Right">
+                    <Button x:Name="MinimizeButton" 
+                            Content="─" 
+                            Width="35" 
+                            Height="25"
+                            Background="Transparent" 
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Margin="0"
+                            Click="MinimizeButton_Click"
+                            ToolTip="Свернуть"/>
+
+                    <Button x:Name="MaximizeButton" 
+                            Content="□" 
+                            Width="35" 
+                            Height="25"
+                            Background="Transparent" 
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            Margin="0"
+                            Click="MaximizeButton_Click"
+                            ToolTip="Развернуть"/>
+
+                    <Button x:Name="CloseButton" 
+                            Content="×" 
+                            Width="35" 
+                            Height="25"
+                            Background="Transparent" 
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Margin="0,0,5,0"
+                            Click="CloseButton_Click"
+                            ToolTip="Закрыть"/>
+                </StackPanel>
             </Grid>
         </Border>
 
+        <!-- Основное содержимое -->
+        <Border Grid.Row="1" 
+                x:Name="MainBorder" 
+                Margin="10" 
+                CornerRadius="30">
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black"/>
+                    <GradientStop Color="#FF009999" Offset="0.2"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="40" Color="LightGray" ShadowDepth="0" Opacity="0.8"/>
+            </Border.Effect>
+
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Clear Time (очень крупно) -->
+                <Grid Grid.Row="0" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" 
+                           Content="CLEAR TIME" 
+                           Style="{StaticResource DataLabelStyle}"
+                           FontSize="24"
+                           Margin="0,0,0,10"/>
+
+                    <TextBlock x:Name="Result_Demo" 
+                              Grid.Row="1"
+                              Style="{StaticResource HugeTimeStyle}"
+                              FontSize="80"
+                              Margin="20"/>
+                </Grid>
+
+                <!-- Busts and Skips (среднего размера) -->
+                <Grid Grid.Row="1" Margin="0,20,0,40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Busts -->
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                        <Label Content="BUSTS" 
+                               Style="{StaticResource DataLabelStyle}"
+                               FontSize="28"
+                               Margin="0,0,0,10"/>
+                        <TextBox x:Name="Bust_Q" 
+                                Style="{StaticResource CounterTextBoxStyle}"
+                                FontSize="64" 
+                                Width="180" 
+                                Height="100"
+                                Margin="0"/>
+                    </StackPanel>
+
+                    <!-- Skips -->
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                        <Label Content="SKIPS" 
+                               Style="{StaticResource DataLabelStyle}"
+                               FontSize="28"
+                               Margin="0,0,0,10"/>
+                        <TextBox x:Name="Skip_Q" 
+                                Style="{StaticResource CounterTextBoxStyle}"
+                                FontSize="64" 
+                                Width="180" 
+                                Height="100"
+                                Margin="0"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Final Time (самое крупное) -->
+                <Grid Grid.Row="2" VerticalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" 
+                           Content="FINAL TIME" 
+                           Style="{StaticResource DataLabelStyle}"
+                           FontSize="28"
+                           Margin="0,0,0,10"/>
+
+                    <TextBlock x:Name="Result_plus_Busts" 
+                              Grid.Row="1"
+                              Style="{StaticResource HugeTimeStyle}"
+                              FontSize="96"
+                              Margin="20"/>
+                </Grid>
+
+            </Grid>
+        </Border>
     </Grid>
 </Window>

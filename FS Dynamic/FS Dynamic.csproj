@@ -130,6 +130,7 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AuthResponce.cs" />
+    <Compile Include="Models\JockerModels.cs" />
     <Compile Include="Models\SaveResultResponse.cs" />
     <Compile Include="Models\Team.cs" />
     <Compile Include="Models\TeamResponse.cs" />
@@ -139,6 +140,7 @@
       <DependentUpon>OperatorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\AuthService.cs" />
+    <Compile Include="Services\JockerApiService.cs" />
     <Compile Include="Services\ResultService.cs" />
     <Compile Include="Services\TeamService.cs" />
     <Page Include="AthleteWindow.xaml">
@@ -188,7 +190,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="FS Dynamic_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

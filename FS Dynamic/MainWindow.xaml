@@ -7,12 +7,13 @@
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="MainWindow" Height="550" Width="900" Icon="/FS_Logo.jpg" Topmost="True" Background="#FF4C4343">
+    
     <Grid Cursor="">
         <Border Height="400" Width="740" Margin="15" Padding="30" VerticalAlignment="Stretch" CornerRadius="50" Cursor="">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black"/>
-                    <GradientStop Color="#FF009999" Offset="1"/>
+                    <GradientStop Color="#FF009999" Offset="0.2"/>
                 </LinearGradientBrush>
             </Border.Background>
             <Border.Effect>
@@ -51,8 +52,30 @@
                 <Button x:Name="Skip_plus" Content="Skip +" Margin="278,182,238,94" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_plus_Click" Width="75" BorderBrush="#FFF90B00"/>
                 <Button x:Name="Skip_min" Content="Skip -" Margin="382,181,134,95" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_min_Click" Width="75"/>
                 <Button x:Name="Bust_min" Content="Bust -" Margin="382,128,133,148" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_min_Click" Width="75" RenderTransformOrigin="0.447,3.782"/>
-
-
+                <CheckBox x:Name="chkJockerMode" Content="Режим Рулетка (API)" 
+              Margin="5,279,5,0" VerticalAlignment="Top"
+              Checked="ChkJockerMode_Checked" Unchecked="ChkJockerMode_Unchecked"/>
+                <ComboBox x:Name="cboJockerCompetitions" Margin="208,-86,263,0" ItemsSource="{Binding JockerCompetitions}" DisplayMemberPath="name" SelectedValuePath="id" SelectionChanged="CboJockerCompetitions_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
+                <ComboBox x:Name="cboJockerDisciplines" Margin="360,-86,111,0" ItemsSource="{Binding JockerDisciplines}" DisplayMemberPath="discipline_name" SelectedValuePath="discipline" SelectionChanged="CboJockerDisciplines_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
+                <ComboBox x:Name="cboJockerRounds" Width="120" Margin="509,-86,-38,0"
+              ItemsSource="{Binding JockerRounds}"
+              SelectedValuePath="round_number"
+              SelectionChanged="CboJockerRounds_SelectionChanged" VerticalAlignment="Top"
+               Visibility="Collapsed"
+                >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                    <Run Text="Раунд "/>
+                    <Run Text="{Binding round_number}"/>
+                    <Run Text=" (" Foreground="Gray" FontSize="10"/>
+                    <Run Text="{Binding team_count}" Foreground="Gray" FontSize="10"/>
+                    <Run Text=")" Foreground="Gray" FontSize="10"/>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                 </ComboBox>
+                <ComboBox x:Name="cboJockerTeams" Margin="644,-86,-177,0" ItemsSource="{Binding JockerTeams}" DisplayMemberPath="team_members_display" SelectedValuePath="jocker_team_id" SelectionChanged="CboJockerTeams_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <Button x:Name="Red_Signal" Content="Signal" Margin="606,277,-90,-1" Foreground="#DDFDFDFC" Background="#FFCA2E26" Height="32" Click="Red_Signal_Click" Width="75"/>
                 <Button x:Name="Lines" Content="Lines" Margin="606,227,-90,49" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Lines_ON_Click" Width="75"/>
 
@@ -60,4 +83,5 @@
         </Border>
 
     </Grid>
+    
 </Window>
