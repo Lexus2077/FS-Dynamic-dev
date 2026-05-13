@@ -9,34 +9,31 @@ namespace FS_Dynamic
     public partial class DemoWindow : Window
     {
         private DispatcherTimer updateTimer;
-        private MainWindow mainWindow;
+        private ITimerReadout readout;
         private bool isMaximized = false;
 
-        public DemoWindow(MainWindow mainWindow)
+        public DemoWindow(ITimerReadout readout)
         {
             InitializeComponent();
-            this.mainWindow = mainWindow;
+            this.readout = readout;
 
-            // Устанавливаем начальный размер
             this.Width = 1200;
             this.Height = 600;
             this.Topmost = false;
 
             InitializeDemoDisplay();
 
-            if (mainWindow != null)
+            if (readout != null)
             {
-                mainWindow.DataUpdated += OnMainWindowDataUpdated;
+                readout.DataUpdated += OnReadoutDataUpdated;
             }
 
-            // Обработка изменения размера окна
             this.SizeChanged += DemoWindow_SizeChanged;
             this.StateChanged += DemoWindow_StateChanged;
         }
 
         private void DemoWindow_StateChanged(object sender, EventArgs e)
         {
-            // Обновляем текст кнопки максимизации
             if (this.WindowState == WindowState.Maximized)
             {
                 MaximizeButton.Content = "❐";
@@ -48,29 +45,25 @@ namespace FS_Dynamic
                 isMaximized = false;
             }
 
-            // Обновляем размеры шрифтов при изменении состояния окна
             UpdateFontSizes();
         }
 
         private void DemoWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            // Динамически меняем размер шрифтов в зависимости от размера окна
             UpdateFontSizes();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // Устанавливаем окно по центру экрана
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             UpdateFontSizes();
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            // Позволяем перетаскивать окно за заголовок
             if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Pressed)
             {
-                if (e.GetPosition(this).Y <= 35) // Проверяем, что клик в области заголовка
+                if (e.GetPosition(this).Y <= 35)
                 {
                     this.DragMove();
                 }
@@ -81,26 +74,25 @@ namespace FS_Dynamic
         {
             try
             {
-                // Базовая ширина для расчета (окно в нормальном состоянии)
                 double baseWidth = 1200;
                 double baseHeight = 600;
 
-                // Текущий масштаб
                 double widthScale = this.ActualWidth / baseWidth;
                 double heightScale = this.ActualHeight / baseHeight;
 
-                // Используем минимальный масштаб из двух измерений для сохранения пропорций
                 double scaleFactor = Math.Min(widthScale, heightScale);
 
-                // Ограничиваем масштаб
                 scaleFactor = Math.Max(0.7, Math.Min(scaleFactor, 2.5));
 
-                // Обновляем размеры шрифтов с приоритетом для времени
                 if (Result_Demo != null)
+                {
                     Result_Demo.FontSize = 80 * scaleFactor;
+                }
 
                 if (Result_plus_Busts != null)
+                {
                     Result_plus_Busts.FontSize = 96 * scaleFactor;
+                }
 
                 if (Bust_Q != null)
                 {
@@ -116,7 +108,6 @@ namespace FS_Dynamic
                     Skip_Q.Height = 100 * scaleFactor;
                 }
 
-                // Обновляем размеры заголовков
                 if (MainBorder != null)
                 {
                     MainBorder.Margin = new Thickness(10 * scaleFactor);
@@ -139,7 +130,7 @@ namespace FS_Dynamic
             updateTimer.Start();
         }
 
-        private void OnMainWindowDataUpdated()
+        private void OnReadoutDataUpdated()
         {
             Dispatcher.BeginInvoke(new Action(UpdateAllData));
         }
@@ -148,12 +139,12 @@ namespace FS_Dynamic
         {
             try
             {
-                if (mainWindow != null)
+                if (readout != null)
                 {
-                    Result_Demo.Text = mainWindow.TimeValue;
-                    Result_plus_Busts.Text = mainWindow.FinalTimeValue;
-                    Bust_Q.Text = mainWindow.BustValue;
-                    Skip_Q.Text = mainWindow.SkipValue;
+                    Result_Demo.Text = readout.TimeValue;
+                    Result_plus_Busts.Text = readout.FinalTimeValue;
+                    Bust_Q.Text = readout.BustValue;
+                    Skip_Q.Text = readout.SkipValue;
                 }
                 else
                 {
@@ -165,8 +156,6 @@ namespace FS_Dynamic
                 Debug.WriteLine($"Ошибка обновления Demo окна: {ex.Message}");
             }
         }
-
-        // Обработчики кнопок управления окном
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -196,7 +185,6 @@ namespace FS_Dynamic
             this.Close();
         }
 
-        // Обработка горячих клавиш
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
@@ -232,9 +220,9 @@ namespace FS_Dynamic
 
         protected override void OnClosed(EventArgs e)
         {
-            if (mainWindow != null)
+            if (readout != null)
             {
-                mainWindow.DataUpdated -= OnMainWindowDataUpdated;
+                readout.DataUpdated -= OnReadoutDataUpdated;
             }
 
             this.SizeChanged -= DemoWindow_SizeChanged;

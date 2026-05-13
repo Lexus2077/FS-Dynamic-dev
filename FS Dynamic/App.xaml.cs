@@ -31,8 +31,33 @@ namespace FS_Dynamic
                 switch (loginWindow.CurrentUser.Role.ToLower())
                 {
                     case "admin":
-                        var mainwindow = new MainWindow();
-                        mainwindow.Show();
+                        var modeWindow = new CompetitionModeWindow();
+                        bool? modeResult = modeWindow.ShowDialog();
+                        if (modeResult != true)
+                        {
+                            Current.Shutdown();
+                            return;
+                        }
+
+                        switch (modeWindow.SelectedMode)
+                        {
+                            case CompetitionMode.Local:
+                                new MainWindow(jockerMode: false).Show();
+                                break;
+                            case CompetitionMode.Jocker:
+                                new MainWindow(jockerMode: true).Show();
+                                break;
+                            case CompetitionMode.Qualification:
+                                new QualificationTimerWindow().Show();
+                                break;
+                            case CompetitionMode.Bracket:
+                                new BracketTimerWindow().Show();
+                                break;
+                            default:
+                                new MainWindow(jockerMode: false).Show();
+                                break;
+                        }
+
                         break;
                     case "operator":
                         new OperatorWindow().Show();

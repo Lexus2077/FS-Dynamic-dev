@@ -122,7 +122,19 @@
     <Compile Include="AthleteWindow.xaml.cs">
       <DependentUpon>AthleteWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CompetitionMode.cs" />
+    <Compile Include="CompetitionModeWindow.xaml.cs">
+      <DependentUpon>CompetitionModeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Data.cs" />
+    <Compile Include="ITimerReadout.cs" />
+    <Compile Include="TimeFormatter.cs" />
+    <Compile Include="BracketTimerWindow.xaml.cs">
+      <DependentUpon>BracketTimerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="QualificationTimerWindow.xaml.cs">
+      <DependentUpon>QualificationTimerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DemoWindow.xaml.cs">
       <DependentUpon>DemoWindow.xaml</DependentUpon>
     </Compile>
@@ -147,6 +159,14 @@
     <Compile Include="Services\QualificationApiService.cs" />
     <Compile Include="Services\ResultService.cs" />
     <Compile Include="Services\TeamService.cs" />
+    <Page Include="BracketTimerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CompetitionModeWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="AthleteWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -156,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="QualificationTimerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
