@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FS_Dynamic"
         mc:Ignorable="d"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="MainWindow" Height="550" Width="900" Icon="/FS_Logo.jpg" Topmost="True" Background="#FF4C4343">
+        Title="MainWindow" Height="620" Width="900" Icon="/FS_Logo.jpg" Topmost="True" Background="#FF4C4343">
     
     <Grid Cursor="">
         <Border Height="400" Width="740" Margin="15" Padding="30" VerticalAlignment="Stretch" CornerRadius="50" Cursor="">
@@ -58,9 +58,27 @@
                 <CheckBox x:Name="chkQualMode" Content="Режим Квалификации (API)"
               Margin="5,302,5,0" VerticalAlignment="Top"
               Checked="ChkQualMode_Checked" Unchecked="ChkQualMode_Unchecked"/>
-                <TextBlock x:Name="lblExistingResult" Margin="8,325,8,0" VerticalAlignment="Top"
+                <CheckBox x:Name="chkBracketMode" Content="Режим Сетки (API)"
+              Margin="5,325,5,0" VerticalAlignment="Top"
+              Checked="ChkBracketMode_Checked" Unchecked="ChkBracketMode_Unchecked"/>
+                <TextBlock x:Name="lblExistingResult" Margin="8,348,8,0" VerticalAlignment="Top"
                            Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap"
                            Visibility="Collapsed" MaxWidth="420"/>
+                <TextBlock x:Name="lblBracketNoMatches" Margin="8,348,8,0" VerticalAlignment="Top"
+                           Foreground="#FFE0E080" FontSize="12" TextWrapping="Wrap"
+                           Visibility="Collapsed" Text="Нет доступных speed-матчей для этой дисциплины."/>
+                <TextBlock x:Name="lblBracketTeam1Result" Margin="16,378,0,0" VerticalAlignment="Top"
+                           Foreground="#E5FFFCFC" FontSize="12" Width="380" TextWrapping="Wrap"
+                           Visibility="Collapsed"/>
+                <TextBlock x:Name="lblBracketTeam2Result" Margin="400,378,16,0" VerticalAlignment="Top"
+                           Foreground="#E5FFFCFC" FontSize="12" Width="400" TextWrapping="Wrap"
+                           Visibility="Collapsed"/>
+                <RadioButton x:Name="rdoBracketSlot1" Content="Ввод для команды 1" GroupName="BracketSlotGroup"
+                             Margin="24,408,0,0" VerticalAlignment="Top" Foreground="#E5FFFCFC"
+                             Visibility="Collapsed" Checked="RdoBracketSlot_Checked"/>
+                <RadioButton x:Name="rdoBracketSlot2" Content="Ввод для команды 2" GroupName="BracketSlotGroup"
+                             Margin="240,408,0,0" VerticalAlignment="Top" Foreground="#E5FFFCFC"
+                             Visibility="Collapsed" Checked="RdoBracketSlot_Checked"/>
                 <ComboBox x:Name="cboJockerCompetitions" Margin="208,-86,263,0" ItemsSource="{Binding JockerCompetitions}" DisplayMemberPath="name" SelectedValuePath="id" SelectionChanged="CboJockerCompetitions_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <ComboBox x:Name="cboJockerDisciplines" Margin="360,-86,111,0" ItemsSource="{Binding JockerDisciplines}" DisplayMemberPath="discipline_name" SelectedValuePath="discipline" SelectionChanged="CboJockerDisciplines_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <ComboBox x:Name="cboJockerRounds" Width="120" Margin="509,-86,-38,0"
@@ -94,6 +112,18 @@
                 <ComboBox x:Name="cboQualTeams" Margin="644,-86,-177,0" VerticalAlignment="Top"
                           DisplayMemberPath="display" SelectedValuePath="id"
                           SelectionChanged="CboQualTeams_SelectionChanged" Visibility="Collapsed"/>
+                <ComboBox x:Name="cboBracketCompetitions" Margin="208,-86,263,0" VerticalAlignment="Top"
+                          DisplayMemberPath="name" SelectedValuePath="id"
+                          SelectionChanged="CboBracketCompetitions_SelectionChanged" Visibility="Collapsed"/>
+                <ComboBox x:Name="cboBracketDisciplines" Margin="360,-86,111,0" VerticalAlignment="Top"
+                          DisplayMemberPath="display_name" SelectedValuePath="discipline"
+                          SelectionChanged="CboBracketDisciplines_SelectionChanged" Visibility="Collapsed"/>
+                <Button x:Name="btnBracketRefresh" Content="Обновить" Margin="500,-86,165,0" VerticalAlignment="Top"
+                        Width="70" Height="22" Click="BtnBracketRefresh_Click" Visibility="Collapsed"
+                        Background="#FF373240" Foreground="#DDFDFDFC"/>
+                <ComboBox x:Name="cboBracketMatches" Margin="585,-86,-118,0" Width="285" VerticalAlignment="Top"
+                          DisplayMemberPath="display"
+                          SelectionChanged="CboBracketMatches_SelectionChanged" Visibility="Collapsed"/>
                 <Button x:Name="Red_Signal" Content="Signal" Margin="606,277,-90,-1" Foreground="#DDFDFDFC" Background="#FFCA2E26" Height="32" Click="Red_Signal_Click" Width="75"/>
                 <Button x:Name="Lines" Content="Lines" Margin="606,227,-90,49" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Lines_ON_Click" Width="75"/>
 

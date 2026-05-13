@@ -131,6 +131,7 @@
     </Compile>
     <Compile Include="Models\AuthResponce.cs" />
     <Compile Include="Models\JockerModels.cs" />
+    <Compile Include="Models\BracketModels.cs" />
     <Compile Include="Models\QualificationModels.cs" />
     <Compile Include="Models\SaveResultResponse.cs" />
     <Compile Include="Models\Team.cs" />
@@ -142,6 +143,7 @@
     </Compile>
     <Compile Include="Services\AuthService.cs" />
     <Compile Include="Services\JockerApiService.cs" />
+    <Compile Include="Services\BracketApiService.cs" />
     <Compile Include="Services\QualificationApiService.cs" />
     <Compile Include="Services\ResultService.cs" />
     <Compile Include="Services\TeamService.cs" />

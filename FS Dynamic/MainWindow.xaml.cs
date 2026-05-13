@@ -85,6 +85,16 @@ namespace FS_Dynamic
         private QualificationApiService _qualApi = new QualificationApiService();
         private bool _isQualMode = false;
 
+        private BracketApiService _bracketApi = new BracketApiService();
+        private bool _isBracketMode = false;
+
+        private List<BracketCompetition> _bracketCompetitions = new List<BracketCompetition>();
+        private List<QualDiscipline> _bracketDisciplines = new List<QualDiscipline>();
+        private List<AvailableMatch> _bracketMatches = new List<AvailableMatch>();
+        private BracketCompetition _selectedBracketCompetition;
+        private string _selectedBracketDisciplineCode;
+        private AvailableMatch _selectedBracketMatch;
+
         private List<QualCompetition> _qualCompetitions = new List<QualCompetition>();
         private List<QualDiscipline> _qualDisciplines = new List<QualDiscipline>();
         private List<QualRound> _qualRounds = new List<QualRound>();
@@ -183,7 +193,7 @@ namespace FS_Dynamic
             bust_q = 0;
             skip_q = 0;
             off_q = 0;
-            if (!_isJockerMode && !_isQualMode)
+            if (!_isJockerMode && !_isQualMode && !_isBracketMode)
             {
                 Team_Name.SelectedIndex++;
             }
@@ -367,6 +377,10 @@ namespace FS_Dynamic
             {
                 chkQualMode.IsChecked = false;
             }
+            if (chkBracketMode.IsChecked == true)
+            {
+                chkBracketMode.IsChecked = false;
+            }
             // 1. Переключаем видимость
             Team_Name.Visibility = Visibility.Collapsed;
             Rounds.Visibility = Visibility.Collapsed;
@@ -376,6 +390,7 @@ namespace FS_Dynamic
             cboJockerRounds.Visibility = Visibility.Visible;
             cboJockerTeams.Visibility = Visibility.Visible;
             lblExistingResult.Visibility = Visibility.Collapsed;
+            SetBracketModeUiVisible(false);
 
             // 2. Устанавливаем режим
             _isJockerMode = true;
@@ -387,7 +402,7 @@ namespace FS_Dynamic
         private void ChkJockerMode_Unchecked(object sender, RoutedEventArgs e)
         {
             // 1. Возвращаем локальные элементы
-            if (!_isQualMode)
+            if (!_isQualMode && !_isBracketMode)
             {
                 Team_Name.Visibility = Visibility.Visible;
                 Rounds.Visibility = Visibility.Visible;
@@ -512,6 +527,10 @@ namespace FS_Dynamic
             {
                 chkJockerMode.IsChecked = false;
             }
+            if (chkBracketMode.IsChecked == true)
+            {
+                chkBracketMode.IsChecked = false;
+            }
 
             Team_Name.Visibility = Visibility.Collapsed;
             Rounds.Visibility = Visibility.Collapsed;
@@ -520,6 +539,8 @@ namespace FS_Dynamic
             cboJockerDisciplines.Visibility = Visibility.Collapsed;
             cboJockerRounds.Visibility = Visibility.Collapsed;
             cboJockerTeams.Visibility = Visibility.Collapsed;
+
+            SetBracketModeUiVisible(false);
 
             cboQualCompetitions.Visibility = Visibility.Visible;
             cboQualDisciplines.Visibility = Visibility.Visible;
@@ -554,10 +575,300 @@ namespace FS_Dynamic
             cboQualRounds.ItemsSource = null;
             cboQualTeams.ItemsSource = null;
 
-            if (chkJockerMode.IsChecked != true)
+            if (chkJockerMode.IsChecked != true && chkBracketMode.IsChecked != true)
             {
                 Team_Name.Visibility = Visibility.Visible;
                 Rounds.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void SetBracketModeUiVisible(bool visible)
+        {
+            var v = visible ? Visibility.Visible : Visibility.Collapsed;
+            cboBracketCompetitions.Visibility = v;
+            cboBracketDisciplines.Visibility = v;
+            btnBracketRefresh.Visibility = v;
+            cboBracketMatches.Visibility = v;
+            lblBracketNoMatches.Visibility = visible
+                && !string.IsNullOrEmpty(_selectedBracketDisciplineCode)
+                && _bracketMatches != null
+                && _bracketMatches.Count == 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+            lblBracketTeam1Result.Visibility = v;
+            lblBracketTeam2Result.Visibility = v;
+            rdoBracketSlot1.Visibility = v;
+            rdoBracketSlot2.Visibility = v;
+        }
+
+        private void ChkBracketMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (chkJockerMode.IsChecked == true)
+            {
+                chkJockerMode.IsChecked = false;
+            }
+            if (chkQualMode.IsChecked == true)
+            {
+                chkQualMode.IsChecked = false;
+            }
+
+            Team_Name.Visibility = Visibility.Collapsed;
+            Rounds.Visibility = Visibility.Collapsed;
+
+            cboJockerCompetitions.Visibility = Visibility.Collapsed;
+            cboJockerDisciplines.Visibility = Visibility.Collapsed;
+            cboJockerRounds.Visibility = Visibility.Collapsed;
+            cboJockerTeams.Visibility = Visibility.Collapsed;
+
+            cboQualCompetitions.Visibility = Visibility.Collapsed;
+            cboQualDisciplines.Visibility = Visibility.Collapsed;
+            cboQualRounds.Visibility = Visibility.Collapsed;
+            cboQualTeams.Visibility = Visibility.Collapsed;
+            lblExistingResult.Visibility = Visibility.Collapsed;
+
+            _bracketMatches.Clear();
+            cboBracketMatches.ItemsSource = null;
+            lblBracketNoMatches.Visibility = Visibility.Collapsed;
+
+            SetBracketModeUiVisible(true);
+            _isBracketMode = true;
+            LoadBracketCompetitions();
+            ClearBracketMatchPanel();
+        }
+
+        private void ChkBracketMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _isBracketMode = false;
+            SetBracketModeUiVisible(false);
+            lblBracketNoMatches.Visibility = Visibility.Collapsed;
+
+            _bracketCompetitions.Clear();
+            _bracketDisciplines.Clear();
+            _bracketMatches.Clear();
+            cboBracketCompetitions.ItemsSource = null;
+            cboBracketDisciplines.ItemsSource = null;
+            cboBracketMatches.ItemsSource = null;
+            _selectedBracketCompetition = null;
+            _selectedBracketDisciplineCode = null;
+            _selectedBracketMatch = null;
+
+            if (chkJockerMode.IsChecked != true && chkQualMode.IsChecked != true)
+            {
+                Team_Name.Visibility = Visibility.Visible;
+                Rounds.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void ClearBracketMatchPanel()
+        {
+            lblBracketTeam1Result.Text = string.Empty;
+            lblBracketTeam2Result.Text = string.Empty;
+            rdoBracketSlot1.IsChecked = false;
+            rdoBracketSlot2.IsChecked = false;
+        }
+
+        private async void LoadBracketCompetitions()
+        {
+            try
+            {
+                var response = await _bracketApi.GetCompetitions();
+                if (response.success && response.data != null)
+                {
+                    _bracketCompetitions = response.data;
+                    cboBracketCompetitions.ItemsSource = _bracketCompetitions;
+                }
+                else
+                {
+                    MessageBox.Show("Ошибка загрузки соревнований (сетка): " + (response.error ?? ""));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка: " + ex.Message);
+            }
+        }
+
+        private async void CboBracketCompetitions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _bracketMatches.Clear();
+            cboBracketMatches.ItemsSource = null;
+            _selectedBracketDisciplineCode = null;
+            if (_isBracketMode)
+            {
+                lblBracketNoMatches.Visibility = Visibility.Collapsed;
+            }
+
+            if (cboBracketCompetitions.SelectedItem is BracketCompetition selected)
+            {
+                _selectedBracketCompetition = selected;
+                var response = await _qualApi.GetDisciplines(selected.id);
+                if (response.success && response.data != null)
+                {
+                    _bracketDisciplines = response.data;
+                    cboBracketDisciplines.ItemsSource = _bracketDisciplines;
+                    cboBracketDisciplines.IsEnabled = true;
+                }
+            }
+        }
+
+        private async void CboBracketDisciplines_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cboBracketDisciplines.SelectedItem is QualDiscipline d && _selectedBracketCompetition != null)
+            {
+                _selectedBracketDisciplineCode = d.discipline;
+                await LoadBracketMatches();
+            }
+        }
+
+        private async void BtnBracketRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadBracketMatches();
+        }
+
+        private async Task LoadBracketMatches()
+        {
+            if (_selectedBracketCompetition == null || string.IsNullOrEmpty(_selectedBracketDisciplineCode))
+            {
+                return;
+            }
+
+            try
+            {
+                var response = await _bracketApi.GetAvailableMatches(
+                    _selectedBracketCompetition.id,
+                    _selectedBracketDisciplineCode);
+
+                if (!response.success)
+                {
+                    MessageBox.Show("Не удалось загрузить матчи: " + (response.error ?? ""));
+                    return;
+                }
+
+                _bracketMatches = response.data ?? new List<AvailableMatch>();
+                cboBracketMatches.ItemsSource = null;
+                cboBracketMatches.ItemsSource = _bracketMatches;
+
+                lblBracketNoMatches.Visibility = _isBracketMode
+                    && !string.IsNullOrEmpty(_selectedBracketDisciplineCode)
+                    && _bracketMatches.Count == 0
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка: " + ex.Message);
+            }
+        }
+
+        private void CboBracketMatches_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedBracketMatch = cboBracketMatches.SelectedItem as AvailableMatch;
+            if (_selectedBracketMatch == null || !_isBracketMode)
+            {
+                ClearBracketMatchPanel();
+                return;
+            }
+
+            var m = _selectedBracketMatch;
+            lblBracketTeam1Result.Text = string.Format(
+                "Команда 1: #{0} «{1}»\nУже: {2}",
+                m.team1 != null ? m.team1.number : 0,
+                m.team1 != null ? m.team1.name : "",
+                m.team1_result_display);
+            lblBracketTeam2Result.Text = string.Format(
+                "Команда 2: #{0} «{1}»\nУже: {2}",
+                m.team2 != null ? m.team2.number : 0,
+                m.team2 != null ? m.team2.name : "",
+                m.team2_result_display);
+
+            if (!m.team1_has_result)
+            {
+                rdoBracketSlot1.IsChecked = true;
+            }
+            else if (!m.team2_has_result)
+            {
+                rdoBracketSlot2.IsChecked = true;
+            }
+            else
+            {
+                rdoBracketSlot1.IsChecked = true;
+            }
+        }
+
+        private void RdoBracketSlot_Checked(object sender, RoutedEventArgs e)
+        {
+            // слот читается при сохранении с радиокнопок
+        }
+
+        private async Task SaveBracketResultToApi()
+        {
+            if (_selectedBracketMatch == null)
+            {
+                MessageBox.Show("Выберите матч!");
+                return;
+            }
+            if (_selectedBracketCompetition == null || string.IsNullOrEmpty(_selectedBracketDisciplineCode))
+            {
+                MessageBox.Show("Выберите соревнование и дисциплину.");
+                return;
+            }
+
+            int slot = rdoBracketSlot2.IsChecked == true ? 2 : 1;
+
+            int timeMs = ConvertTimeToMilliseconds(Result.Text);
+            if (timeMs <= 0)
+            {
+                MessageBox.Show("Время должно быть > 0!");
+                return;
+            }
+
+            string stageKey = _selectedBracketMatch.kind == "final" ? _selectedBracketMatch.stage_key : null;
+            if (_selectedBracketMatch.kind == "final" && string.IsNullOrEmpty(stageKey))
+            {
+                MessageBox.Show("У финального матча не указан stage_key (ошибка данных).");
+                return;
+            }
+
+            var response = await _bracketApi.SaveMatchResult(
+                _selectedBracketCompetition.id,
+                _selectedBracketDisciplineCode,
+                _selectedBracketMatch.match_id,
+                slot,
+                timeMs,
+                bust_q,
+                skip_q,
+                stageKey);
+
+            if (response.success && response.data != null)
+            {
+                var d = response.data;
+                string msg = "Результат команды " + slot + " сохранён.\n"
+                    + "Время: " + Result.Text + " | Б:" + bust_q + " С:" + skip_q + "\n\n"
+                    + (d.message ?? "");
+
+                if (d.winner.HasValue && d.winner_team != null)
+                {
+                    msg += "\n\nПобедитель: #" + d.winner_team.number + " «" + d.winner_team.name + "»";
+                    if (!string.IsNullOrEmpty(d.next_match_winner))
+                    {
+                        msg += "\nДалее (победитель): " + d.next_match_winner;
+                    }
+                    if (!string.IsNullOrEmpty(d.next_match_loser))
+                    {
+                        msg += "\nПроигравшие: " + d.next_match_loser;
+                    }
+                }
+
+                MessageBox.Show(msg);
+                bust_q = 0;
+                skip_q = 0;
+                stopWatch.Reset();
+                OnDataUpdated();
+                await LoadBracketMatches();
+            }
+            else
+            {
+                MessageBox.Show("Ошибка: " + (response.error ?? ""));
             }
         }
 
@@ -856,6 +1167,11 @@ namespace FS_Dynamic
             {
                 FinalResult();
                 await SaveQualResultToApi();
+            }
+            else if (_isBracketMode)
+            {
+                FinalResult();
+                await SaveBracketResultToApi();
             }
             else
             {
@@ -1213,6 +1529,10 @@ namespace FS_Dynamic
 
         private void SwitchToNextTeam()
         {
+            if (_isBracketMode)
+            {
+                return;
+            }
             if (_isQualMode)
             {
                 SwitchToNextQualTeam();
