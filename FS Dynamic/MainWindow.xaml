@@ -55,6 +55,12 @@
                 <CheckBox x:Name="chkJockerMode" Content="Режим Рулетка (API)" 
               Margin="5,279,5,0" VerticalAlignment="Top"
               Checked="ChkJockerMode_Checked" Unchecked="ChkJockerMode_Unchecked"/>
+                <CheckBox x:Name="chkQualMode" Content="Режим Квалификации (API)"
+              Margin="5,302,5,0" VerticalAlignment="Top"
+              Checked="ChkQualMode_Checked" Unchecked="ChkQualMode_Unchecked"/>
+                <TextBlock x:Name="lblExistingResult" Margin="8,325,8,0" VerticalAlignment="Top"
+                           Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap"
+                           Visibility="Collapsed" MaxWidth="420"/>
                 <ComboBox x:Name="cboJockerCompetitions" Margin="208,-86,263,0" ItemsSource="{Binding JockerCompetitions}" DisplayMemberPath="name" SelectedValuePath="id" SelectionChanged="CboJockerCompetitions_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <ComboBox x:Name="cboJockerDisciplines" Margin="360,-86,111,0" ItemsSource="{Binding JockerDisciplines}" DisplayMemberPath="discipline_name" SelectedValuePath="discipline" SelectionChanged="CboJockerDisciplines_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <ComboBox x:Name="cboJockerRounds" Width="120" Margin="509,-86,-38,0"
@@ -76,6 +82,18 @@
                     </ComboBox.ItemTemplate>
                  </ComboBox>
                 <ComboBox x:Name="cboJockerTeams" Margin="644,-86,-177,0" ItemsSource="{Binding JockerTeams}" DisplayMemberPath="team_members_display" SelectedValuePath="jocker_team_id" SelectionChanged="CboJockerTeams_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
+                <ComboBox x:Name="cboQualCompetitions" Margin="208,-86,263,0" VerticalAlignment="Top"
+                          DisplayMemberPath="name" SelectedValuePath="id"
+                          SelectionChanged="CboQualCompetitions_SelectionChanged" Visibility="Collapsed"/>
+                <ComboBox x:Name="cboQualDisciplines" Margin="360,-86,111,0" VerticalAlignment="Top"
+                          DisplayMemberPath="display_name" SelectedValuePath="discipline"
+                          SelectionChanged="CboQualDisciplines_SelectionChanged" Visibility="Collapsed"/>
+                <ComboBox x:Name="cboQualRounds" Margin="509,-86,-38,0" Width="120" VerticalAlignment="Top"
+                          DisplayMemberPath="display" SelectedValuePath="round_number"
+                          SelectionChanged="CboQualRounds_SelectionChanged" Visibility="Collapsed"/>
+                <ComboBox x:Name="cboQualTeams" Margin="644,-86,-177,0" VerticalAlignment="Top"
+                          DisplayMemberPath="display" SelectedValuePath="id"
+                          SelectionChanged="CboQualTeams_SelectionChanged" Visibility="Collapsed"/>
                 <Button x:Name="Red_Signal" Content="Signal" Margin="606,277,-90,-1" Foreground="#DDFDFDFC" Background="#FFCA2E26" Height="32" Click="Red_Signal_Click" Width="75"/>
                 <Button x:Name="Lines" Content="Lines" Margin="606,227,-90,49" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Lines_ON_Click" Width="75"/>
 

@@ -82,6 +82,20 @@ namespace FS_Dynamic
         private JockerApiService _jockerApi = new JockerApiService();
         private bool _isJockerMode = false;
 
+        private QualificationApiService _qualApi = new QualificationApiService();
+        private bool _isQualMode = false;
+
+        private List<QualCompetition> _qualCompetitions = new List<QualCompetition>();
+        private List<QualDiscipline> _qualDisciplines = new List<QualDiscipline>();
+        private List<QualRound> _qualRounds = new List<QualRound>();
+        private List<QualTeam> _qualTeams = new List<QualTeam>();
+        private List<QualificationResultRow> _qualAllResults = new List<QualificationResultRow>();
+
+        private QualCompetition _selectedQualCompetition;
+        private QualDiscipline _selectedQualDiscipline;
+        private QualRound _selectedQualRound;
+        private QualTeam _selectedQualTeam;
+
         // НЕ НУЖНЫ ObservableCollection - используем просто List и привязку через ItemsSource
         private List<Competition> _jockerCompetitions = new List<Competition>();
         private List<Discipline> _jockerDisciplines = new List<Discipline>();
@@ -169,16 +183,23 @@ namespace FS_Dynamic
             bust_q = 0;
             skip_q = 0;
             off_q = 0;
-            Team_Name.SelectedIndex++;
-            Data.Choosen_TeamName = Team_Name.Text;
-
-            //Автоматическое переключение команд
+            if (!_isJockerMode && !_isQualMode)
+            {
+                Team_Name.SelectedIndex++;
+            }
             if (!_firstTeamInRound)
             {
                 SwitchToNextTeam();
             }
             _firstTeamInRound = false;
-            Data.Choosen_TeamName = Team_Name.Text;
+            if (_isQualMode && cboQualTeams.SelectedItem is QualTeam qt)
+            {
+                Data.Choosen_TeamName = qt.display;
+            }
+            else
+            {
+                Data.Choosen_TeamName = Team_Name.Text;
+            }
 
         }
 
@@ -342,6 +363,10 @@ namespace FS_Dynamic
 
        private void ChkJockerMode_Checked(object sender, RoutedEventArgs e)
         {
+            if (chkQualMode.IsChecked == true)
+            {
+                chkQualMode.IsChecked = false;
+            }
             // 1. Переключаем видимость
             Team_Name.Visibility = Visibility.Collapsed;
             Rounds.Visibility = Visibility.Collapsed;
@@ -350,7 +375,8 @@ namespace FS_Dynamic
             cboJockerDisciplines.Visibility = Visibility.Visible;
             cboJockerRounds.Visibility = Visibility.Visible;
             cboJockerTeams.Visibility = Visibility.Visible;
-            
+            lblExistingResult.Visibility = Visibility.Collapsed;
+
             // 2. Устанавливаем режим
             _isJockerMode = true;
             
@@ -361,8 +387,11 @@ namespace FS_Dynamic
         private void ChkJockerMode_Unchecked(object sender, RoutedEventArgs e)
         {
             // 1. Возвращаем локальные элементы
-            Team_Name.Visibility = Visibility.Visible;
-            Rounds.Visibility = Visibility.Visible;
+            if (!_isQualMode)
+            {
+                Team_Name.Visibility = Visibility.Visible;
+                Rounds.Visibility = Visibility.Visible;
+            }
             
             // 2. Скрываем API элементы
             cboJockerCompetitions.Visibility = Visibility.Collapsed;
@@ -476,6 +505,340 @@ namespace FS_Dynamic
                 // Здесь можно обновить UI с информацией о команде
             }
         }
+
+        private void ChkQualMode_Checked(object sender, RoutedEventArgs e)
+        {
+            if (chkJockerMode.IsChecked == true)
+            {
+                chkJockerMode.IsChecked = false;
+            }
+
+            Team_Name.Visibility = Visibility.Collapsed;
+            Rounds.Visibility = Visibility.Collapsed;
+
+            cboJockerCompetitions.Visibility = Visibility.Collapsed;
+            cboJockerDisciplines.Visibility = Visibility.Collapsed;
+            cboJockerRounds.Visibility = Visibility.Collapsed;
+            cboJockerTeams.Visibility = Visibility.Collapsed;
+
+            cboQualCompetitions.Visibility = Visibility.Visible;
+            cboQualDisciplines.Visibility = Visibility.Visible;
+            cboQualRounds.Visibility = Visibility.Visible;
+            cboQualTeams.Visibility = Visibility.Visible;
+            lblExistingResult.Visibility = Visibility.Visible;
+
+            _isQualMode = true;
+            LoadQualCompetitions();
+            UpdateExistingResultLabel();
+        }
+
+        private void ChkQualMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _isQualMode = false;
+
+            cboQualCompetitions.Visibility = Visibility.Collapsed;
+            cboQualDisciplines.Visibility = Visibility.Collapsed;
+            cboQualRounds.Visibility = Visibility.Collapsed;
+            cboQualTeams.Visibility = Visibility.Collapsed;
+            lblExistingResult.Visibility = Visibility.Collapsed;
+            lblExistingResult.Text = string.Empty;
+
+            _qualCompetitions.Clear();
+            _qualDisciplines.Clear();
+            _qualRounds.Clear();
+            _qualTeams.Clear();
+            _qualAllResults.Clear();
+
+            cboQualCompetitions.ItemsSource = null;
+            cboQualDisciplines.ItemsSource = null;
+            cboQualRounds.ItemsSource = null;
+            cboQualTeams.ItemsSource = null;
+
+            if (chkJockerMode.IsChecked != true)
+            {
+                Team_Name.Visibility = Visibility.Visible;
+                Rounds.Visibility = Visibility.Visible;
+            }
+        }
+
+        private async void LoadQualCompetitions()
+        {
+            try
+            {
+                var response = await _qualApi.GetCompetitions();
+                if (response.success && response.data != null)
+                {
+                    _qualCompetitions = response.data;
+                    cboQualCompetitions.ItemsSource = _qualCompetitions;
+                }
+                else
+                {
+                    MessageBox.Show("Ошибка загрузки соревнований (квалификация): " + (response.error ?? ""));
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка: " + ex.Message);
+            }
+        }
+
+        private async void CboQualCompetitions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cboQualCompetitions.SelectedItem is QualCompetition selected)
+            {
+                _selectedQualCompetition = selected;
+
+                var response = await _qualApi.GetDisciplines(selected.id);
+                if (response.success && response.data != null)
+                {
+                    _qualDisciplines = response.data;
+                    cboQualDisciplines.ItemsSource = _qualDisciplines;
+                    cboQualDisciplines.IsEnabled = true;
+                }
+            }
+        }
+
+        private async void CboQualDisciplines_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cboQualDisciplines.SelectedItem is QualDiscipline selected && _selectedQualCompetition != null)
+            {
+                _selectedQualDiscipline = selected;
+
+                var roundsTask = _qualApi.GetRounds(_selectedQualCompetition.id, selected.discipline);
+                var teamsTask = _qualApi.GetTeams(_selectedQualCompetition.id, selected.discipline);
+                var resultsTask = _qualApi.GetResults(_selectedQualCompetition.id, selected.discipline);
+
+                await Task.WhenAll(roundsTask, teamsTask, resultsTask);
+
+                var roundsResp = await roundsTask;
+                var teamsResp = await teamsTask;
+                var resultsResp = await resultsTask;
+
+                if (roundsResp.success && roundsResp.data != null)
+                {
+                    _qualRounds = roundsResp.data;
+                    cboQualRounds.ItemsSource = null;
+                    cboQualRounds.ItemsSource = _qualRounds;
+                    cboQualRounds.IsEnabled = true;
+                }
+                else
+                {
+                    _qualRounds = new List<QualRound>();
+                    cboQualRounds.ItemsSource = null;
+                }
+
+                if (teamsResp.success && teamsResp.data != null)
+                {
+                    _qualTeams = teamsResp.data;
+                }
+                else
+                {
+                    _qualTeams = new List<QualTeam>();
+                }
+
+                if (resultsResp.success && resultsResp.data != null)
+                {
+                    _qualAllResults = resultsResp.data;
+                }
+                else
+                {
+                    _qualAllResults = new List<QualificationResultRow>();
+                }
+
+                _firstTeamInRound = true;
+                if (_qualRounds.Count > 0)
+                {
+                    cboQualRounds.SelectedIndex = 0;
+                }
+                else
+                {
+                    BindQualTeamsGrid();
+                    EnrichTeamsWithResults();
+                }
+            }
+        }
+
+        private void CboQualRounds_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cboQualRounds.SelectedItem is QualRound selected)
+            {
+                _selectedQualRound = selected;
+                _firstTeamInRound = true;
+                EnrichTeamsWithResults();
+                BindQualTeamsGrid();
+            }
+        }
+
+        private void BindQualTeamsGrid()
+        {
+            cboQualTeams.ItemsSource = null;
+            cboQualTeams.ItemsSource = _qualTeams;
+            cboQualTeams.DisplayMemberPath = "display";
+        }
+
+        private void EnrichTeamsWithResults()
+        {
+            if (_qualTeams == null)
+            {
+                return;
+            }
+
+            int roundNum = _selectedQualRound != null ? _selectedQualRound.round_number : 0;
+
+            foreach (var team in _qualTeams)
+            {
+                team.existing_result = null;
+            }
+
+            if (roundNum <= 0 || _qualAllResults == null)
+            {
+                return;
+            }
+
+            foreach (var team in _qualTeams)
+            {
+                var row = _qualAllResults.FirstOrDefault(r =>
+                    r.team_id == team.id && r.round_number == roundNum);
+                if (row != null)
+                {
+                    team.existing_result = new QualExistingResult
+                    {
+                        time_ms = row.time_ms,
+                        busts = row.busts,
+                        skips = row.skips,
+                        total_time_ms = row.total_time_ms
+                    };
+                }
+            }
+        }
+
+        private void CboQualTeams_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (cboQualTeams.SelectedItem is QualTeam selected)
+            {
+                _selectedQualTeam = selected;
+            }
+            else
+            {
+                _selectedQualTeam = null;
+            }
+
+            UpdateExistingResultLabel();
+        }
+
+        private void UpdateExistingResultLabel()
+        {
+            if (!_isQualMode)
+            {
+                return;
+            }
+
+            if (_selectedQualTeam == null)
+            {
+                lblExistingResult.Text = "Выберите команду";
+                lblExistingResult.Visibility = Visibility.Visible;
+                return;
+            }
+
+            if (_selectedQualTeam.existing_result != null)
+            {
+                var r = _selectedQualTeam.existing_result;
+                lblExistingResult.Text = string.Format(
+                    "Уже введено: {0} | Б:{1} С:{2}",
+                    r.time_display,
+                    r.busts,
+                    r.skips);
+                lblExistingResult.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                lblExistingResult.Text = "Результат ещё не введён";
+                lblExistingResult.Visibility = Visibility.Visible;
+            }
+        }
+
+        private async Task RefreshQualAfterSave()
+        {
+            if (_selectedQualCompetition == null || _selectedQualDiscipline == null)
+            {
+                return;
+            }
+
+            int prevRound = _selectedQualRound != null ? _selectedQualRound.round_number : 0;
+
+            var roundsResp = await _qualApi.GetRounds(_selectedQualCompetition.id, _selectedQualDiscipline.discipline);
+            var resultsResp = await _qualApi.GetResults(_selectedQualCompetition.id, _selectedQualDiscipline.discipline);
+
+            if (roundsResp.success && roundsResp.data != null)
+            {
+                _qualRounds = roundsResp.data;
+                cboQualRounds.ItemsSource = null;
+                cboQualRounds.ItemsSource = _qualRounds;
+                if (prevRound > 0)
+                {
+                    var match = _qualRounds.FirstOrDefault(r => r.round_number == prevRound);
+                    if (match != null)
+                    {
+                        cboQualRounds.SelectedItem = match;
+                    }
+                }
+            }
+
+            if (resultsResp.success && resultsResp.data != null)
+            {
+                _qualAllResults = resultsResp.data;
+            }
+
+            EnrichTeamsWithResults();
+            BindQualTeamsGrid();
+            UpdateExistingResultLabel();
+        }
+
+        private async Task SaveQualResultToApi()
+        {
+            if (_selectedQualTeam == null || _selectedQualRound == null)
+            {
+                MessageBox.Show("Выберите команду и раунд!");
+                return;
+            }
+
+            int timeMs = ConvertTimeToMilliseconds(Result.Text);
+            if (timeMs <= 0)
+            {
+                MessageBox.Show("Время должно быть > 0!");
+                return;
+            }
+
+            var response = await _qualApi.SaveResult(
+                _selectedQualCompetition.id,
+                _selectedQualDiscipline.discipline,
+                _selectedQualTeam.id,
+                _selectedQualRound.round_number,
+                timeMs,
+                bust_q,
+                skip_q);
+
+            if (response.success && response.data != null)
+            {
+                var d = response.data;
+                double totalSec = d.total_time_ms.HasValue ? d.total_time_ms.Value / 1000.0 : 0;
+                MessageBox.Show(
+                    "Результат сохранён!\n" +
+                    "Команда: " + _selectedQualTeam.display + "\n" +
+                    "Время: " + Result.Text + " | Басты: " + bust_q + " | Скипы: " + skip_q + "\n" +
+                    "Итого: " + totalSec.ToString("F3", CultureInfo.InvariantCulture) + " сек");
+
+                bust_q = 0;
+                skip_q = 0;
+                stopWatch.Reset();
+                OnDataUpdated();
+                await RefreshQualAfterSave();
+            }
+            else
+            {
+                MessageBox.Show("Ошибка: " + (response.error ?? ""));
+            }
+        }
         
         // ============================================
         // МОДИФИЦИРОВАННЫЙ МЕТОД СОХРАНЕНИЯ РЕЗУЛЬТАТОВ
@@ -488,6 +851,11 @@ namespace FS_Dynamic
                 FinalResult();
                 // Сохраняем через API
                 await SaveResultToApi();
+            }
+            else if (_isQualMode)
+            {
+                FinalResult();
+                await SaveQualResultToApi();
             }
             else
             {
@@ -845,7 +1213,11 @@ namespace FS_Dynamic
 
         private void SwitchToNextTeam()
         {
-            if (_isJockerMode)
+            if (_isQualMode)
+            {
+                SwitchToNextQualTeam();
+            }
+            else if (_isJockerMode)
             {
                 SwitchToNextJockerTeam();
             }
@@ -891,6 +1263,27 @@ namespace FS_Dynamic
             if (cboJockerTeams.SelectedItem is JockerTeam selected)
             {
                 _selectedTeam = selected;
+                OnDataUpdated();
+            }
+        }
+
+        private void SwitchToNextQualTeam()
+        {
+            if (cboQualTeams.Items.Count == 0) return;
+
+            int currentIndex = cboQualTeams.SelectedIndex;
+            int nextIndex = currentIndex + 1;
+
+            if (nextIndex >= cboQualTeams.Items.Count)
+            {
+                nextIndex = cboQualTeams.Items.Count - 1;
+            }
+
+            cboQualTeams.SelectedIndex = nextIndex;
+
+            if (cboQualTeams.SelectedItem is QualTeam selected)
+            {
+                _selectedQualTeam = selected;
                 OnDataUpdated();
             }
         }
