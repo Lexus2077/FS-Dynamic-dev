@@ -11,7 +11,7 @@ namespace FS_Dynamic.Services
     public class BracketApiService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl = "http://fsdynamic.ru/fs-dynamic-web/competitions/api";
+        private readonly string _apiBaseUrl = AppConfig.CompetitionsApiUrl;
 
         public BracketApiService()
         {

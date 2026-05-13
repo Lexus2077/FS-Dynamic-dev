@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Локальная конфигурация (содержит адреса серверов — не коммитить)
+.env

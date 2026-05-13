@@ -13,7 +13,7 @@ namespace FS_Dynamic.Services
     public class JockerApiService
     {
         private readonly HttpClient _httpClient;
-        private string _apiBaseUrl = "http://fsdynamic.ru/fs-dynamic-web/competitions/api";
+        private readonly string _apiBaseUrl = AppConfig.CompetitionsApiUrl;
 
         public JockerApiService()
         {

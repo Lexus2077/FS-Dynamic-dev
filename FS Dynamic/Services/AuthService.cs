@@ -10,7 +10,7 @@ namespace FS_Dynamic.Services
 {
     internal class AuthService
     {
-        private readonly string _apiBaseUrl = "http://fsdynamic.ru/fs-dynamic-web/api/";
+        private readonly string _apiBaseUrl = AppConfig.LegacyApiUrl;
         private readonly HttpClient _httpClient;
 
         public AuthService()
