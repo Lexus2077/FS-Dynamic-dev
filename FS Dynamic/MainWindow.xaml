@@ -9,7 +9,7 @@
         Title="FS Dynamic — таймер" Height="640" Width="900" Icon="/FS_Logo.jpg" Topmost="True" Background="#FF4C4343">
 
     <Grid Cursor="">
-        <Border Height="520" Width="740" Margin="15" Padding="30" VerticalAlignment="Stretch" CornerRadius="50" Cursor="">
+        <Border Height="520" Width="740" Margin="80,40,80,64" Padding="30" CornerRadius="50" Cursor="">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black"/>
@@ -24,11 +24,11 @@
 
 
                 <Button x:Name="On" Content="Yellow" Margin="272,57,233,219" Foreground="#DDFDFF06" Background="#FF373240" Width="75" Height="32" Click="Yellow"/>
-                <Button x:Name="Off" Content="White" HorizontalAlignment="Left" Margin="382,57,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.4,-1.156" Background="#FF373240" Grid.Column="1" Height="32" Click="White"/>
-                <ComboBox x:Name="COM" HorizontalAlignment="Left" Margin="25,-56,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="COM_SelectionChanged" Height="22" Background="#00000000" Grid.ColumnSpan="2"/>
-                <ComboBox x:Name= "Team_Name" HorizontalAlignment="Left" Margin="208,-56,0,0" VerticalAlignment="Top" Width="120" Loaded="Team_Name_Loaded" Height="22"/>
-                <ComboBox x:Name="Rounds" HorizontalAlignment="Left" Margin="360,-56,0,0" VerticalAlignment="Top" Width="120" Height="22" RenderTransformOrigin="0.451,0.756" Loaded="Rounds_Loaded"/>
-                <TextBlock x:Name="TextIn" HorizontalAlignment="Left" Margin="26,0,0,0" TextWrapping="Wrap" Text="Status" VerticalAlignment="Top" Height="33" Width="84" Foreground="White" FontSize="20" TextAlignment="Center" RenderTransformOrigin="0.512,-0.939" Grid.ColumnSpan="2">
+                <Button x:Name="Off" Content="White" HorizontalAlignment="Left" Margin="382,117,0,0" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.4,-1.156" Background="#FF373240" Height="32" Click="White"/>
+                <ComboBox x:Name="COM" HorizontalAlignment="Left" Margin="22,0,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="COM_SelectionChanged" Height="22" Background="#00000000"/>
+                <ComboBox x:Name= "Team_Name" HorizontalAlignment="Left" Margin="206,0,0,0" VerticalAlignment="Top" Width="120" Loaded="Team_Name_Loaded" Height="22"/>
+                <ComboBox x:Name="Rounds" HorizontalAlignment="Left" Margin="392,0,0,0" VerticalAlignment="Top" Width="120" Height="22" RenderTransformOrigin="0.451,0.756" Loaded="Rounds_Loaded"/>
+                <TextBlock x:Name="TextIn" HorizontalAlignment="Left" Margin="40,77,0,0" TextWrapping="Wrap" Text="Status" VerticalAlignment="Top" Height="33" Width="84" Foreground="White" FontSize="20" TextAlignment="Center" RenderTransformOrigin="0.512,-0.939">
                     <TextBlock.Background>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                             <GradientStop Color="Black" Offset="1"/>
@@ -36,22 +36,22 @@
                         </LinearGradientBrush>
                     </TextBlock.Background>
                 </TextBlock>
-                <TextBlock x:Name="Result" HorizontalAlignment="Left" Margin="100,109,0,163" TextWrapping="Wrap" Width="196" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" Text="00:000&#xA;" FontWeight="Bold" Height="53"/>
-                <Label Margin="61,109,431,173" Content="Clear Time:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC" Grid.ColumnSpan="2"/>
-                <TextBlock x:Name= "Bust_Q" HorizontalAlignment="Left" Margin="160,140,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" Height="36" FontSize="20" Text="0" TextAlignment="Center" Foreground="#FFDCDBDB"/>
-                <TextBlock x:Name= "Skip_Q" HorizontalAlignment="Left" Margin="160,181,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" Height="36" FontSize="20" Text="0" TextAlignment="Center" Foreground="#FFDCDBDB"/>
-                <Label Margin="68,150,424,132" Content="Busts:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
-                <Label Margin="68,191,424,91" Content="Skips:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
-                <TextBlock x:Name="Result_plus_Busts" HorizontalAlignment="Left" Margin="100,233,0,0" TextWrapping="Wrap" Text="00:000" VerticalAlignment="Top" Width="196" Height="53" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" FontWeight="Bold"/>
-                <Label Margin="61,233,431,49" Content="Final Time:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
+                <TextBlock x:Name="Result" HorizontalAlignment="Left" Margin="100,154,0,221" TextWrapping="Wrap" Width="196" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" Text="00:000&#xA;" FontWeight="Bold" Height="53"/>
+                <Label Margin="56,152,436,130" Content="Clear Time:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
+                <TextBlock x:Name= "Bust_Q" HorizontalAlignment="Left" Margin="148,198,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" Height="36" FontSize="20" Text="0" TextAlignment="Center" Foreground="#FFDCDBDB"/>
+                <TextBlock x:Name= "Skip_Q" HorizontalAlignment="Left" Margin="148,242,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="50" Height="36" FontSize="20" Text="0" TextAlignment="Center" Foreground="#FFDCDBDB"/>
+                <Label Margin="56,198,436,84" Content="Busts:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
+                <Label Margin="56,241,436,41" Content="Skips:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
+                <TextBlock x:Name="Result_plus_Busts" HorizontalAlignment="Left" Margin="100,288,0,0" TextWrapping="Wrap" Text="00:000" VerticalAlignment="Top" Width="196" Height="53" OpacityMask="#FFF9F9F9" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" FontWeight="Bold"/>
+                <Label Margin="56,287,436,-5" Content="Final Time:" FontSize="16" RenderTransformOrigin="0.414,0.155" FontWeight="Bold" Foreground="#E5FFFCFC"/>
 
                 <Button x:Name="Result_Time" Content="Final" Margin="278,228,239,48" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Result_Time_Click" Width="75"/>
                 <Button x:Name="Show_Demo" Content="Demo" Margin="606,1,-90,275" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Open_Demo" Width="75"/>
                 <Button x:Name="Stop_Round" Content="End" Margin="490,57,26,219" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Stop_Round_Click" Width="75"/>
-                <Button x:Name="Bust" Content="Bust +" Margin="278,128,238,148" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_Click" Width="75" BorderBrush="#FFF90B00"/>
+                <Button x:Name="Bust" Content="Bust +" Margin="278,198,238,198" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_Click" Width="75" BorderBrush="#FFF90B00"/>
                 <Button x:Name="Skip_plus" Content="Skip +" Margin="278,182,238,94" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_plus_Click" Width="75" BorderBrush="#FFF90B00"/>
-                <Button x:Name="Skip_min" Content="Skip -" Margin="382,181,134,95" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_min_Click" Width="75"/>
-                <Button x:Name="Bust_min" Content="Bust -" Margin="382,128,133,148" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_min_Click" Width="75" RenderTransformOrigin="0.447,3.782"/>
+                <Button x:Name="Skip_min" Content="Skip -" Margin="382,242,134,154" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_min_Click" Width="75"/>
+                <Button x:Name="Bust_min" Content="Bust -" Margin="382,198,134,198" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_min_Click" Width="75" RenderTransformOrigin="0.447,3.782"/>
                 <ComboBox x:Name="cboJockerCompetitions" Margin="208,-86,263,0" ItemsSource="{Binding JockerCompetitions}" DisplayMemberPath="name" SelectedValuePath="id" SelectionChanged="CboJockerCompetitions_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <ComboBox x:Name="cboJockerDisciplines" Margin="360,-86,111,0" ItemsSource="{Binding JockerDisciplines}" DisplayMemberPath="discipline_name" SelectedValuePath="discipline" SelectionChanged="CboJockerDisciplines_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <ComboBox x:Name="cboJockerRounds" Width="120" Margin="509,-86,-38,0"
@@ -71,7 +71,7 @@
                             </TextBlock>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
-                 </ComboBox>
+                </ComboBox>
                 <ComboBox x:Name="cboJockerTeams" Margin="644,-86,-177,0" ItemsSource="{Binding JockerTeams}" DisplayMemberPath="team_members_display" SelectedValuePath="id" SelectionChanged="CboJockerTeams_SelectionChanged" VerticalAlignment="Top"  Visibility="Collapsed"/>
                 <Button x:Name="Red_Signal" Content="Signal" Margin="606,277,-90,-1" Foreground="#DDFDFDFC" Background="#FFCA2E26" Height="32" Click="Red_Signal_Click" Width="75"/>
                 <Button x:Name="Lines" Content="Lines" Margin="606,227,-90,49" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Lines_ON_Click" Width="75"/>

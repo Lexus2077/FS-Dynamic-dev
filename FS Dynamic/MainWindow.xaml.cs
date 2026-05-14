@@ -24,12 +24,12 @@ namespace FS_Dynamic
         private int skip_q;
         private TimeSpan ts_0 = new TimeSpan(0, 0, 0, 0, 0);
 
-        private string path = "C:\\+\\FS_Arduino\\Results.txt";
-        private string path_teams = "C:\\+\\FS_Arduino\\Teams.txt";
-        private string path_each_tuch = "C:\\+\\FS_Arduino\\Result_each_tuch.txt";
+        private string path = "D:\\projects\\Results.txt";
+        private string path_teams = "D:\\projects\\Teams.txt";
+        private string path_each_tuch = "D:\\projects\\Result_each_tuch.txt";
         private string team_name;
         private string round_number;
-        private string path_rounds = "C:\\+\\FS_Arduino\\Rounds.txt";
+        private string path_rounds = "D:\\projects\\Rounds.txt";
         private int off_q;
         private string ready = "Ready";
         private string set = "Set";
