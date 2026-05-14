@@ -4,6 +4,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="FS Dynamic — турнирная сетка" Height="680" Width="920" Icon="/FS_Logo.jpg" Topmost="True" Background="#FF4C4343">
     <Grid>
+        <Button x:Name="BtnChangeCompetitionMode" Content="Сменить режим"
+                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,16,0"
+                Padding="12,6" Background="#FF555555" Foreground="White" BorderBrush="#FF777777"
+                Click="ChangeCompetitionMode_Click"
+                ToolTip="Локальный / Joker / квалификация / турнирная сетка"/>
         <Border Height="560" Width="760" Margin="15" Padding="30" VerticalAlignment="Stretch" CornerRadius="50">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

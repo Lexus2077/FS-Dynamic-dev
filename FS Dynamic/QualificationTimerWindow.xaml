@@ -6,6 +6,11 @@
         mc:Ignorable="d"
         Title="FS Dynamic — квалификация" Height="640" Width="900" Icon="/FS_Logo.jpg" Topmost="True" Background="#FF4C4343">
     <Grid>
+        <Button x:Name="BtnChangeCompetitionMode" Content="Сменить режим"
+                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,16,0"
+                Padding="12,6" Background="#FF555555" Foreground="White" BorderBrush="#FF777777"
+                Click="ChangeCompetitionMode_Click"
+                ToolTip="Локальный / Joker / квалификация / турнирная сетка"/>
         <Border Height="520" Width="740" Margin="115,87,45,17" Padding="30" CornerRadius="50">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">

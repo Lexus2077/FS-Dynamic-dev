@@ -135,6 +135,11 @@ namespace FS_Dynamic
             }
         }
 
+        private void ChangeCompetitionMode_Click(object sender, RoutedEventArgs e)
+        {
+            CompetitionModeNavigator.ShowModePickerAndSwitch(this);
+        }
+
         private void Yellow(object sender, RoutedEventArgs e)
         {
             sp.Write("y");
