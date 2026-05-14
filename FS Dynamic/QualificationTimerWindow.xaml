@@ -56,8 +56,8 @@
                 <Button x:Name="Skip_plus" Content="Skip +" Margin="278,229,238,167" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_plus_Click" Width="75" BorderBrush="#FFF90B00"/>
                 <Button x:Name="Skip_min" Content="Skip -" Margin="382,229,133,167" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_min_Click" Width="75"/>
                 <Button x:Name="Bust_min" Content="Bust -" Margin="382,128,133,148" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_min_Click" Width="75"/>
-                <TextBlock x:Name="lblExistingResult" Margin="8,272,8,0" VerticalAlignment="Top"
-                           Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap" MaxWidth="420"/>
+                <TextBlock x:Name="lblExistingResult" Margin="50,308,137,0" VerticalAlignment="Top"
+                      Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap" MaxWidth="420" Height="86"/>
                 <Button x:Name="Red_Signal" Content="Signal" Margin="606,277,-90,-1" Foreground="#DDFDFDFC" Background="#FFCA2E26" Height="32" Click="Red_Signal_Click" Width="75"/>
                 <Button x:Name="Lines" Content="Lines" Margin="606,227,-90,49" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Lines_ON_Click" Width="75"/>
             </Grid>

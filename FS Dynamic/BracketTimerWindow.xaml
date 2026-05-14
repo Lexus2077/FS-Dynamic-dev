@@ -54,20 +54,20 @@
                 <Button x:Name="Skip_plus" Content="Skip +" Margin="288,230,248,206" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_plus_Click" Width="75" BorderBrush="#FFF90B00"/>
                 <Button x:Name="Skip_min" Content="Skip -" Margin="392,230,143,206" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Skip_min_Click" Width="75"/>
                 <Button x:Name="Bust_min" Content="Bust -" Margin="392,188,143,248" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_min_Click" Width="75"/>
-                <TextBlock x:Name="lblBracketNoMatches" Margin="8,272,8,0" VerticalAlignment="Top"
+                <TextBlock x:Name="lblBracketNoMatches" Margin="54,307,-5,0" VerticalAlignment="Top"
                            Foreground="#FFE0E080" FontSize="12" TextWrapping="Wrap"
-                           Visibility="Collapsed" Text="Нет доступных speed-матчей для этой дисциплины."/>
-                <TextBlock x:Name="lblBracketTeam1Result" Margin="16,308,0,0" VerticalAlignment="Top"
-                           Foreground="#E5FFFCFC" FontSize="12" Width="380" TextWrapping="Wrap"
+                           Text="Нет доступных speed-матчей для этой дисциплины." Visibility="Collapsed"/>
+                <TextBlock x:Name="lblBracketTeam1Result" Margin="50,344,286,0" VerticalAlignment="Top"
+                           Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap" Height="67"
                            Visibility="Collapsed"/>
-                <TextBlock x:Name="lblBracketTeam2Result" Margin="400,308,16,0" VerticalAlignment="Top"
-                           Foreground="#E5FFFCFC" FontSize="12" Width="400" TextWrapping="Wrap"
+                <TextBlock x:Name="lblBracketTeam2Result" Margin="325,344,0,0" VerticalAlignment="Top"
+                           Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap" Height="67"
                            Visibility="Collapsed"/>
                 <RadioButton x:Name="rdoBracketSlot1" Content="Ввод для команды 1" GroupName="BracketSlotGroup"
-                             Margin="24,368,0,0" VerticalAlignment="Top" Foreground="#E5FFFCFC"
+                             Margin="50,315,367,0" VerticalAlignment="Top" Foreground="#E5FFFCFC"
                              Visibility="Collapsed" Checked="RdoBracketSlot_Checked"/>
                 <RadioButton x:Name="rdoBracketSlot2" Content="Ввод для команды 2" GroupName="BracketSlotGroup"
-                             Margin="240,368,0,0" VerticalAlignment="Top" Foreground="#E5FFFCFC"
+                             Margin="244,315,198,0" VerticalAlignment="Top" Foreground="#E5FFFCFC"
                              Visibility="Collapsed" Checked="RdoBracketSlot_Checked"/>
                 <Button x:Name="Red_Signal" Content="Signal" Margin="606,277,-90,-1" Foreground="#DDFDFDFC" Background="#FFCA2E26" Height="32" Click="Red_Signal_Click" Width="75"/>
                 <Button x:Name="Lines" Content="Lines" Margin="606,227,-90,49" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Lines_ON_Click" Width="75"/>
