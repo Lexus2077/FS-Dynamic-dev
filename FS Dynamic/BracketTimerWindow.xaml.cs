@@ -275,6 +275,23 @@ namespace FS_Dynamic
             rdoBracketSlot2.Visibility = v;
         }
 
+        private void ApplyBracketSlotRadioLabels(AvailableMatch match)
+        {
+            if (match == null)
+            {
+                rdoBracketSlot1.Content = "Ввод для команды 1";
+                rdoBracketSlot2.Content = "Ввод для команды 2";
+                return;
+            }
+
+            rdoBracketSlot1.Content = match.team1 != null
+                ? "Ввод для команды #" + match.team1.number
+                : "Ввод для команды 1";
+            rdoBracketSlot2.Content = match.team2 != null
+                ? "Ввод для команды #" + match.team2.number
+                : "Ввод для команды 2";
+        }
+
         private async void LoadBracketCompetitions()
         {
             try
@@ -399,6 +416,7 @@ namespace FS_Dynamic
                 rdoBracketSlot1.IsChecked = true;
             }
 
+            ApplyBracketSlotRadioLabels(m);
             OnDataUpdated();
         }
 
@@ -412,6 +430,7 @@ namespace FS_Dynamic
             lblBracketTeam2Result.Text = string.Empty;
             rdoBracketSlot1.IsChecked = false;
             rdoBracketSlot2.IsChecked = false;
+            ApplyBracketSlotRadioLabels(null);
             SetBracketMatchPanelVisibility(false);
         }
 

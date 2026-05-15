@@ -68,6 +68,7 @@
                 <TextBlock x:Name="lblBracketTeam2Result" Margin="325,344,0,0" VerticalAlignment="Top"
                            Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap" Height="67"
                            Visibility="Collapsed"/>
+                <!-- Подписи «Ввод для команды #…» выставляются в коде при выборе матча (ApplyBracketSlotRadioLabels). -->
                 <RadioButton x:Name="rdoBracketSlot1" Content="Ввод для команды 1" GroupName="BracketSlotGroup"
                              Margin="50,315,367,0" VerticalAlignment="Top" Foreground="#E5FFFCFC"
                              Visibility="Collapsed" Checked="RdoBracketSlot_Checked"/>
