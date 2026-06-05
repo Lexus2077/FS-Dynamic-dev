@@ -1,4 +1,5 @@
 using FS_Dynamic.Models;
+using FS_Dynamic.Resources;
 using FS_Dynamic.Services;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,8 @@ using System.IO;
 using System.IO.Ports;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace FS_Dynamic
@@ -21,7 +24,7 @@ namespace FS_Dynamic
         private int bust_q;
         private int skip_q;
         private TimeSpan ts_0 = new TimeSpan(0, 0, 0, 0, 0);
-        private string path_each_tuch = "C:\\+\\FS_Arduino\\Result_each_tuch.txt";
+        private string path_each_tuch = "C:\\FS_Dynamic\\Result_each_tuch.txt";
         private int off_q;
         private string ready = "Ready";
         private string set = "Set";
@@ -109,6 +112,8 @@ namespace FS_Dynamic
             COM.ItemsSource = ports;
             sp.DataReceived += DataRecieved;
             LoadBracketCompetitions();
+            Shutdown.OnStateChanged += OnSystemStateChanged;
+            UpdateButtonState();
         }
 
         private void OnDataUpdated()
@@ -482,6 +487,7 @@ namespace FS_Dynamic
                 entry.team != null ? entry.team.name : "");
             lblBracketTeam2Result.Text = string.Empty;
             rdoBracketSlot1.IsChecked = true;
+            UpdateChoosenTeamNameFromBracket();
             OnDataUpdated();
         }
 
@@ -519,11 +525,14 @@ namespace FS_Dynamic
             }
 
             ApplyBracketSlotRadioLabels(m);
+            UpdateChoosenTeamNameFromBracket();
             OnDataUpdated();
         }
 
         private void RdoBracketSlot_Checked(object sender, RoutedEventArgs e)
         {
+            UpdateChoosenTeamNameFromBracket();
+            OnDataUpdated();
         }
 
         private void ClearBracketMatchPanel()
@@ -680,7 +689,17 @@ namespace FS_Dynamic
 
         public void FinalResult()
         {
-            TimeSpan ts_bust = new TimeSpan(0, 0, 0, 5, 0);
+            TimeSpan ts_bust;
+
+            if (cboBracketDisciplines.Text.StartsWith("DS"))
+            {
+                ts_bust = new TimeSpan(0, 0, 0, 3, 0);
+            }
+            else
+            {
+                ts_bust = new TimeSpan(0, 0, 0, 5, 0);
+            }
+
             TimeSpan ts_skip = new TimeSpan(0, 0, 0, 20, 0);
             string resultwithbusts;
             if (bust_q != 0 && skip_q == 0)
@@ -737,6 +756,51 @@ namespace FS_Dynamic
         {
             CloseSerialPort();
             base.OnClosing(e);
+        }
+
+        private void Switch_Click(object sender, RoutedEventArgs e)
+        {
+            if (!Shutdown.IsOn)
+            {
+                sp.Write("d");
+            }
+            else
+            {
+                sp.Write("t");
+            }
+            Shutdown.Toggle();
+            UpdateButtonState();
+        }
+
+        private void OnSystemStateChanged(bool isOn)
+        {
+            Dispatcher.Invoke(() => UpdateButtonState());
+        }
+
+        private void UpdateButtonState()
+        {
+            Button btn = this.FindName("SystemBtn") as Button;
+            if (btn != null)
+            {
+                btn.Content = Shutdown.IsOn ? "Switch Off" : "Switch On";
+
+                var converter = new System.Windows.Media.BrushConverter();
+
+                if (Shutdown.IsOn)
+                {
+                    btn.Background = (Brush)converter.ConvertFromString("#FFCA2E26");
+                }
+                else
+                {
+                    btn.Background = (Brush)converter.ConvertFromString("#FF22D20A");
+                }
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            Shutdown.OnStateChanged -= OnSystemStateChanged;
+            base.OnClosed(e);
         }
     }
 }

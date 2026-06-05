@@ -77,6 +77,8 @@
                              Visibility="Collapsed" Checked="RdoBracketSlot_Checked"/>
                 <Button x:Name="Red_Signal" Content="Signal" Margin="606,277,-90,-1" Foreground="#DDFDFDFC" Background="#FFCA2E26" Height="32" Click="Red_Signal_Click" Width="75"/>
                 <Button x:Name="Lines" Content="Lines" Margin="606,227,-90,49" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Lines_ON_Click" Width="75"/>
+                <Button x:Name="SystemBtn" Content="Switch On" Margin="571,386,-90,10" Foreground="#DDFDFDFC" Background="#FF22D20A" Height="32" Click="Switch_Click" Width="110"/>
+
             </Grid>
         </Border>
     </Grid>
