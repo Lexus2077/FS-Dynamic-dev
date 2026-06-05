@@ -61,7 +61,7 @@
                 <Button x:Name="Bust_min" Content="Bust -" Margin="392,188,143,248" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_min_Click" Width="75"/>
                 <TextBlock x:Name="lblBracketNoMatches" Margin="54,307,-5,0" VerticalAlignment="Top"
                            Foreground="#FFE0E080" FontSize="12" TextWrapping="Wrap"
-                           Text="Нет доступных speed-матчей для этой дисциплины." Visibility="Collapsed"/>
+                           Text="Нет доступных матчей и записей распределения мест." Visibility="Collapsed"/>
                 <TextBlock x:Name="lblBracketTeam1Result" Margin="50,344,286,0" VerticalAlignment="Top"
                            Foreground="#E5FFFCFC" FontSize="12" TextWrapping="Wrap" Height="67"
                            Visibility="Collapsed"/>

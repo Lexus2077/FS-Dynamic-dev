@@ -63,6 +63,38 @@ namespace FS_Dynamic.Services
             return PostAsync<SaveMatchResultResponse>("brackets.php", payload);
         }
 
+        public Task<ApiResponse<List<AvailablePlacementEntry>>> GetAvailablePlacementEntries(int competitionId, string discipline)
+        {
+            return PostAsync<List<AvailablePlacementEntry>>("brackets.php", new
+            {
+                action = "get_available_placement_entries",
+                competition_id = competitionId,
+                discipline = discipline
+            });
+        }
+
+        public Task<ApiResponse<SavePlacementResultResponse>> SavePlacementResult(
+            int competitionId,
+            string discipline,
+            string placementId,
+            int teamId,
+            int timeMs,
+            int busts,
+            int skips)
+        {
+            return PostAsync<SavePlacementResultResponse>("brackets.php", new
+            {
+                action = "save_placement_result",
+                competition_id = competitionId,
+                discipline = discipline,
+                placement_id = placementId,
+                team_id = teamId,
+                time_ms = timeMs,
+                busts = busts,
+                skips = skips
+            });
+        }
+
         private async Task<ApiResponse<T>> GetAsync<T>(string endpoint)
         {
             try

@@ -84,4 +84,62 @@ namespace FS_Dynamic.Models
         public string next_match_loser { get; set; }
         public string message { get; set; }
     }
+
+    public class AvailablePlacementEntry
+    {
+        public string placement_id { get; set; }
+        public string placement_name { get; set; }
+        public int min_place { get; set; }
+        public int max_place { get; set; }
+        public int team_id { get; set; }
+        public BracketTeamInfo team { get; set; }
+        public double? time_seconds { get; set; }
+        public int busts { get; set; }
+        public int skips { get; set; }
+        public int? place { get; set; }
+        public string display { get; set; }
+    }
+
+    public class SavePlacementResultResponse
+    {
+        public string placement_id { get; set; }
+        public int team_id { get; set; }
+        public BracketTeamInfo team { get; set; }
+        public double? time_seconds { get; set; }
+        public int busts { get; set; }
+        public int skips { get; set; }
+        public double? total_time_seconds { get; set; }
+        public int? place { get; set; }
+        public bool places_calculated { get; set; }
+        public string message { get; set; }
+    }
+
+    /// <summary>Элемент выпадающего списка: матч сетки или запись распределения мест.</summary>
+    public class BracketTimerEntry
+    {
+        public string display { get; set; }
+        public string entry_kind { get; set; }
+        public AvailableMatch match { get; set; }
+        public AvailablePlacementEntry placement { get; set; }
+
+        public static BracketTimerEntry FromMatch(AvailableMatch match)
+        {
+            return new BracketTimerEntry
+            {
+                display = "[Матч] " + (match.display ?? match.match_id),
+                entry_kind = "match",
+                match = match
+            };
+        }
+
+        public static BracketTimerEntry FromPlacement(AvailablePlacementEntry placement)
+        {
+            return new BracketTimerEntry
+            {
+                display = "[Места] " + (placement.display ?? placement.placement_name),
+                entry_kind = "placement",
+                placement = placement
+            };
+        }
+    }
 }

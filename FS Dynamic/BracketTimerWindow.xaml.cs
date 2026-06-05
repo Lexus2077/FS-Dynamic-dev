@@ -33,10 +33,10 @@ namespace FS_Dynamic
 
         private List<BracketCompetition> _bracketCompetitions = new List<BracketCompetition>();
         private List<QualDiscipline> _bracketDisciplines = new List<QualDiscipline>();
-        private List<AvailableMatch> _bracketMatches = new List<AvailableMatch>();
+        private List<BracketTimerEntry> _bracketEntries = new List<BracketTimerEntry>();
         private BracketCompetition _selectedBracketCompetition;
         private string _selectedBracketDisciplineCode;
-        private AvailableMatch _selectedBracketMatch;
+        private BracketTimerEntry _selectedBracketEntry;
 
         public string TimeValue => Result.Text;
         public string FinalTimeValue => Result_plus_Busts.Text;
@@ -46,28 +46,59 @@ namespace FS_Dynamic
         {
             get
             {
-                if (_selectedBracketMatch == null)
+                if (_selectedBracketEntry == null)
+                {
+                    return "—";
+                }
+
+                if (_selectedBracketEntry.entry_kind == "placement" && _selectedBracketEntry.placement?.team != null)
+                {
+                    var t = _selectedBracketEntry.placement.team;
+                    return "#" + t.number + " «" + t.name + "»";
+                }
+
+                if (_selectedBracketEntry.entry_kind != "match" || _selectedBracketEntry.match == null)
                 {
                     return "—";
                 }
 
                 int slot = rdoBracketSlot2.IsChecked == true ? 2 : 1;
-                if (slot == 2 && _selectedBracketMatch.team2 != null)
+                if (slot == 2 && _selectedBracketEntry.match.team2 != null)
                 {
-                    return "#" + _selectedBracketMatch.team2.number + " «" + _selectedBracketMatch.team2.name + "»";
+                    return "#" + _selectedBracketEntry.match.team2.number + " «" + _selectedBracketEntry.match.team2.name + "»";
                 }
 
-                if (_selectedBracketMatch.team1 != null)
+                if (_selectedBracketEntry.match.team1 != null)
                 {
-                    return "#" + _selectedBracketMatch.team1.number + " «" + _selectedBracketMatch.team1.name + "»";
+                    return "#" + _selectedBracketEntry.match.team1.number + " «" + _selectedBracketEntry.match.team1.name + "»";
                 }
 
                 return "—";
             }
         }
 
-        public string SelectedRound =>
-            _selectedBracketMatch != null ? ("Матч " + _selectedBracketMatch.match_id) : "—";
+        public string SelectedRound
+        {
+            get
+            {
+                if (_selectedBracketEntry == null)
+                {
+                    return "—";
+                }
+
+                if (_selectedBracketEntry.entry_kind == "placement" && _selectedBracketEntry.placement != null)
+                {
+                    return _selectedBracketEntry.placement.placement_name ?? _selectedBracketEntry.placement.placement_id;
+                }
+
+                if (_selectedBracketEntry.match != null)
+                {
+                    return "Матч " + _selectedBracketEntry.match.match_id;
+                }
+
+                return "—";
+            }
+        }
 
         public event Action DataUpdated;
 
@@ -144,19 +175,30 @@ namespace FS_Dynamic
 
         private void UpdateChoosenTeamNameFromBracket()
         {
-            if (_selectedBracketMatch == null)
+            if (_selectedBracketEntry == null)
+            {
+                return;
+            }
+
+            if (_selectedBracketEntry.entry_kind == "placement" && _selectedBracketEntry.placement?.team != null)
+            {
+                Data.Choosen_TeamName = _selectedBracketEntry.placement.team.name;
+                return;
+            }
+
+            if (_selectedBracketEntry.entry_kind != "match" || _selectedBracketEntry.match == null)
             {
                 return;
             }
 
             int slot = rdoBracketSlot2.IsChecked == true ? 2 : 1;
-            if (slot == 2 && _selectedBracketMatch.team2 != null)
+            if (slot == 2 && _selectedBracketEntry.match.team2 != null)
             {
-                Data.Choosen_TeamName = _selectedBracketMatch.team2.name;
+                Data.Choosen_TeamName = _selectedBracketEntry.match.team2.name;
             }
-            else if (_selectedBracketMatch.team1 != null)
+            else if (_selectedBracketEntry.match.team1 != null)
             {
-                Data.Choosen_TeamName = _selectedBracketMatch.team1.name;
+                Data.Choosen_TeamName = _selectedBracketEntry.match.team1.name;
             }
         }
 
@@ -315,7 +357,7 @@ namespace FS_Dynamic
 
         private async void CboBracketCompetitions_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            _bracketMatches.Clear();
+            _bracketEntries.Clear();
             cboBracketMatches.ItemsSource = null;
             _selectedBracketDisciplineCode = null;
             lblBracketNoMatches.Visibility = Visibility.Collapsed;
@@ -356,22 +398,45 @@ namespace FS_Dynamic
 
             try
             {
-                var response = await _bracketApi.GetAvailableMatches(
+                var matchesTask = _bracketApi.GetAvailableMatches(
+                    _selectedBracketCompetition.id,
+                    _selectedBracketDisciplineCode);
+                var placementsTask = _bracketApi.GetAvailablePlacementEntries(
                     _selectedBracketCompetition.id,
                     _selectedBracketDisciplineCode);
 
-                if (!response.success)
+                await Task.WhenAll(matchesTask, placementsTask);
+
+                var matchesResponse = matchesTask.Result;
+                var placementsResponse = placementsTask.Result;
+
+                if (!matchesResponse.success)
                 {
-                    MessageBox.Show("Не удалось загрузить матчи: " + (response.error ?? ""));
+                    MessageBox.Show("Не удалось загрузить матчи: " + (matchesResponse.error ?? ""));
+                    return;
+                }
+                if (!placementsResponse.success)
+                {
+                    MessageBox.Show("Не удалось загрузить распределение мест: " + (placementsResponse.error ?? ""));
                     return;
                 }
 
-                _bracketMatches = response.data ?? new List<AvailableMatch>();
+                var entries = new List<BracketTimerEntry>();
+                foreach (var match in matchesResponse.data ?? new List<AvailableMatch>())
+                {
+                    entries.Add(BracketTimerEntry.FromMatch(match));
+                }
+                foreach (var placement in placementsResponse.data ?? new List<AvailablePlacementEntry>())
+                {
+                    entries.Add(BracketTimerEntry.FromPlacement(placement));
+                }
+
+                _bracketEntries = entries;
                 cboBracketMatches.ItemsSource = null;
-                cboBracketMatches.ItemsSource = _bracketMatches;
+                cboBracketMatches.ItemsSource = _bracketEntries;
 
                 lblBracketNoMatches.Visibility =
-                    !string.IsNullOrEmpty(_selectedBracketDisciplineCode) && _bracketMatches.Count == 0
+                    !string.IsNullOrEmpty(_selectedBracketDisciplineCode) && _bracketEntries.Count == 0
                         ? Visibility.Visible
                         : Visibility.Collapsed;
             }
@@ -383,15 +448,52 @@ namespace FS_Dynamic
 
         private void CboBracketMatches_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            _selectedBracketMatch = cboBracketMatches.SelectedItem as AvailableMatch;
-            if (_selectedBracketMatch == null)
+            _selectedBracketEntry = cboBracketMatches.SelectedItem as BracketTimerEntry;
+            if (_selectedBracketEntry == null)
+            {
+                ClearBracketMatchPanel();
+                return;
+            }
+
+            if (_selectedBracketEntry.entry_kind == "placement")
+            {
+                ApplyPlacementSelection(_selectedBracketEntry.placement);
+                return;
+            }
+
+            ApplyMatchSelection(_selectedBracketEntry.match);
+        }
+
+        private void ApplyPlacementSelection(AvailablePlacementEntry entry)
+        {
+            if (entry == null)
+            {
+                ClearBracketMatchPanel();
+                return;
+            }
+
+            SetBracketMatchPanelVisibility(false);
+            lblBracketTeam1Result.Visibility = Visibility.Visible;
+            lblBracketTeam1Result.Text = string.Format(
+                "Распределение мест ({0}–{1})\nКоманда: #{2} «{3}»\nРезультат ещё не введён",
+                entry.min_place,
+                entry.max_place,
+                entry.team != null ? entry.team.number : 0,
+                entry.team != null ? entry.team.name : "");
+            lblBracketTeam2Result.Text = string.Empty;
+            rdoBracketSlot1.IsChecked = true;
+            OnDataUpdated();
+        }
+
+        private void ApplyMatchSelection(AvailableMatch m)
+        {
+            if (m == null)
             {
                 ClearBracketMatchPanel();
                 return;
             }
 
             SetBracketMatchPanelVisibility(true);
-            var m = _selectedBracketMatch;
             lblBracketTeam1Result.Text = string.Format(
                 "Команда 1: #{0} «{1}»\nУже: {2}",
                 m.team1 != null ? m.team1.number : 0,
@@ -436,9 +538,9 @@ namespace FS_Dynamic
 
         private async Task SaveBracketResultToApi()
         {
-            if (_selectedBracketMatch == null)
+            if (_selectedBracketEntry == null)
             {
-                MessageBox.Show("Выберите матч!");
+                MessageBox.Show("Выберите матч или запись распределения мест!");
                 return;
             }
 
@@ -448,8 +550,6 @@ namespace FS_Dynamic
                 return;
             }
 
-            int slot = rdoBracketSlot2.IsChecked == true ? 2 : 1;
-
             int timeMs = TimeFormatter.ConvertTimeToMilliseconds(Result.Text);
             if (timeMs <= 0)
             {
@@ -457,8 +557,27 @@ namespace FS_Dynamic
                 return;
             }
 
-            string stageKey = _selectedBracketMatch.kind == "final" ? _selectedBracketMatch.stage_key : null;
-            if (_selectedBracketMatch.kind == "final" && string.IsNullOrEmpty(stageKey))
+            if (_selectedBracketEntry.entry_kind == "placement")
+            {
+                await SavePlacementResultToApi(timeMs);
+                return;
+            }
+
+            await SaveMatchResultToApi(timeMs);
+        }
+
+        private async Task SaveMatchResultToApi(int timeMs)
+        {
+            var match = _selectedBracketEntry?.match;
+            if (match == null)
+            {
+                MessageBox.Show("Выберите матч!");
+                return;
+            }
+
+            int slot = rdoBracketSlot2.IsChecked == true ? 2 : 1;
+            string stageKey = match.kind == "final" ? match.stage_key : null;
+            if (match.kind == "final" && string.IsNullOrEmpty(stageKey))
             {
                 MessageBox.Show("У финального матча не указан stage_key (ошибка данных).");
                 return;
@@ -467,7 +586,7 @@ namespace FS_Dynamic
             var response = await _bracketApi.SaveMatchResult(
                 _selectedBracketCompetition.id,
                 _selectedBracketDisciplineCode,
-                _selectedBracketMatch.match_id,
+                match.match_id,
                 slot,
                 timeMs,
                 bust_q,
@@ -496,16 +615,61 @@ namespace FS_Dynamic
                 }
 
                 MessageBox.Show(msg);
-                bust_q = 0;
-                skip_q = 0;
-                stopWatch.Reset();
-                OnDataUpdated();
+                ResetTimerAfterSave();
                 await LoadBracketMatches();
             }
             else
             {
                 MessageBox.Show("Ошибка: " + (response.error ?? ""));
             }
+        }
+
+        private async Task SavePlacementResultToApi(int timeMs)
+        {
+            var placement = _selectedBracketEntry?.placement;
+            if (placement == null)
+            {
+                MessageBox.Show("Выберите команду в распределении мест!");
+                return;
+            }
+
+            var response = await _bracketApi.SavePlacementResult(
+                _selectedBracketCompetition.id,
+                _selectedBracketDisciplineCode,
+                placement.placement_id,
+                placement.team_id,
+                timeMs,
+                bust_q,
+                skip_q);
+
+            if (response.success && response.data != null)
+            {
+                var d = response.data;
+                string msg = "Результат распределения мест сохранён.\n"
+                    + "Время: " + Result.Text + " | Б:" + bust_q + " С:" + skip_q + "\n\n"
+                    + (d.message ?? "");
+
+                if (d.place.HasValue)
+                {
+                    msg += "\n\nМесто: " + d.place.Value;
+                }
+
+                MessageBox.Show(msg);
+                ResetTimerAfterSave();
+                await LoadBracketMatches();
+            }
+            else
+            {
+                MessageBox.Show("Ошибка: " + (response.error ?? ""));
+            }
+        }
+
+        private void ResetTimerAfterSave()
+        {
+            bust_q = 0;
+            skip_q = 0;
+            stopWatch.Reset();
+            OnDataUpdated();
         }
 
         private async void Result_Time_Click(object sender, RoutedEventArgs e)
