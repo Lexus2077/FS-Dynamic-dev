@@ -14,6 +14,9 @@ namespace FS_Dynamic
 {
     public partial class BracketTimerWindow : Window, ITimerReadout
     {
+        /// <summary>Отключить Arduino/COM для локального тестирования API.</summary>
+        private const bool UseArduino = false;
+
         private readonly SerialPort sp = new SerialPort();
         private readonly string[] ports = SerialPort.GetPortNames();
         private readonly Stopwatch stopWatch = new Stopwatch();
@@ -106,9 +109,37 @@ namespace FS_Dynamic
         {
             InitializeComponent();
             InitializeDecorativeTimer();
-            COM.ItemsSource = ports;
-            sp.DataReceived += DataRecieved;
+            if (UseArduino)
+            {
+                COM.ItemsSource = ports;
+                sp.DataReceived += DataRecieved;
+            }
+            else
+            {
+                COM.Visibility = Visibility.Collapsed;
+            }
+
             LoadBracketCompetitions();
+        }
+
+        private void WriteSerial(string command)
+        {
+            if (!UseArduino || !sp.IsOpen)
+            {
+                return;
+            }
+
+            sp.Write(command);
+        }
+
+        private void SetTestTime(int seconds, int milliseconds = 0)
+        {
+            ts_0 = new TimeSpan(0, 0, 0, seconds, milliseconds);
+            Result.Text = $"{seconds:00}:{milliseconds:000}";
+            TextIn.Text = "Test";
+            stopWatch.Reset();
+            StopDecorativeTimer();
+            OnDataUpdated();
         }
 
         private void OnDataUpdated()
@@ -118,6 +149,11 @@ namespace FS_Dynamic
 
         private void COM_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
+            if (!UseArduino)
+            {
+                return;
+            }
+
             try
             {
                 if (sp.IsOpen)
@@ -160,8 +196,8 @@ namespace FS_Dynamic
 
         private void Yellow(object sender, RoutedEventArgs e)
         {
-            sp.Write("y");
-            Dispatcher.Invoke(() => TextIn.Text = ready);
+            WriteSerial("y");
+            TextIn.Text = ready;
             Result.Text = "00:000";
             Result_plus_Busts.Text = "00:000";
             Bust_Q.Text = "0";
@@ -204,15 +240,27 @@ namespace FS_Dynamic
 
         private void White(object sender, RoutedEventArgs e)
         {
-            sp.Write("w");
-            Dispatcher.Invoke(() => TextIn.Text = set);
+            WriteSerial("w");
+            TextIn.Text = set;
+
+            if (!UseArduino)
+            {
+                stopWatch.Reset();
+                stopWatch.Start();
+                StartDecorativeTimer();
+            }
+        }
+
+        private void TestTime5s_Click(object sender, RoutedEventArgs e)
+        {
+            SetTestTime(5);
         }
 
         private void Bust_Click(object sender, RoutedEventArgs e)
         {
             bust_q++;
             Bust_Q.Text = bust_q.ToString();
-            sp.Write("b");
+            WriteSerial("b");
             OnDataUpdated();
         }
 
@@ -227,7 +275,7 @@ namespace FS_Dynamic
         {
             skip_q++;
             Skip_Q.Text = skip_q.ToString();
-            sp.Write("b");
+            WriteSerial("b");
             OnDataUpdated();
         }
 
@@ -240,9 +288,18 @@ namespace FS_Dynamic
 
         private void Stop_Round_Click(object sender, RoutedEventArgs e)
         {
-            sp.Write("f");
+            WriteSerial("f");
             stopWatch.Stop();
-            Dispatcher.Invoke(() => Result.Text = string.Format("{0:00}:{1:000}", (int)ts_0.TotalSeconds, ts_0.Milliseconds));
+            if (UseArduino)
+            {
+                Result.Text = string.Format("{0:00}:{1:000}", (int)ts_0.TotalSeconds, ts_0.Milliseconds);
+            }
+            else if (stopWatch.Elapsed.TotalMilliseconds > 0)
+            {
+                ts_0 = stopWatch.Elapsed;
+                Result.Text = string.Format("{0:00}:{1:000}", (int)ts_0.TotalSeconds, ts_0.Milliseconds);
+            }
+
             stopWatch.Reset();
             StopDecorativeTimer();
             OnDataUpdated();
@@ -260,12 +317,12 @@ namespace FS_Dynamic
 
         private void Lines_ON_Click(object sender, RoutedEventArgs e)
         {
-            sp.Write("g");
+            WriteSerial("g");
         }
 
         private void Red_Signal_Click(object sender, RoutedEventArgs e)
         {
-            sp.Write("r");
+            WriteSerial("r");
         }
 
         private void Open_Demo(object sender, RoutedEventArgs e)
@@ -717,6 +774,11 @@ namespace FS_Dynamic
 
         private void CloseSerialPort()
         {
+            if (!UseArduino)
+            {
+                return;
+            }
+
             try
             {
                 if (sp != null && sp.IsOpen)

@@ -53,6 +53,8 @@
                 <TextBlock x:Name="Result_plus_Busts" HorizontalAlignment="Left" Margin="82,278,0,0" TextWrapping="Wrap" Text="00:000" VerticalAlignment="Top" Width="196" Height="53" Foreground="#FFDCDBDB" FontSize="20" TextAlignment="Center" FontWeight="Bold"/>
                 <Label Margin="47,277,445,5" Content="Final Time:" FontSize="16" FontWeight="Bold" Foreground="#E5FFFCFC"/>
                 <Button x:Name="Result_Time" Content="Final" Margin="288,276,248,160" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Result_Time_Click" Width="75"/>
+                <Button x:Name="BtnTestTime5s" Content="5 сек" Margin="392,276,143,160" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="TestTime5s_Click" Width="75"
+                        ToolTip="Тест: установить время 05:000 без Arduino"/>
                 <Button x:Name="Show_Demo" Content="Demo" Margin="616,137,-80,299" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Open_Demo" Width="75"/>
                 <Button x:Name="Stop_Round" Content="End" Margin="490,57,26,219" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Stop_Round_Click" Width="75"/>
                 <Button x:Name="Bust" Content="Bust +" Margin="288,188,248,248" Foreground="#DDFDFDFC" Background="#FF373240" Height="32" Click="Bust_Click" Width="75" BorderBrush="#FFF90B00"/>
